@@ -188,7 +188,27 @@ def play_background_loop(audio_key, volume=0.3):
         return False
 
 
-#break
+
+def button_press_sound(button_type="normal"):
+    """Play subtle click sounds for different button types"""
+    frequencies = {
+        "normal": 800,    # Regular menu navigation
+        "select": 1000,   # Entering a mode
+        "back": 600,      # Going back
+        "special": 1200   # Special actions
+    }
+    
+    try:
+        import winsound
+        winsound.Beep(frequencies[button_type], 80)  # Short beep
+    except ImportError:
+        # Fallback for systems without winsound (like Raspberry Pi)
+        print(f"♪ {button_type} click")
+
+
+
+
+#breakx2
 # Sacred Colors That Work
 SACRED_COLORS = {
     "fire": (0, 0, 1),      # Red flame - YOUR CREATION
@@ -594,10 +614,11 @@ def element_transition(element):
     set_sacred_color(element)
 
 def await_sacred_input():
-    """Wait for input"""
+    """Wait for input with audio feedback"""
     while True:
         button = scan_sacred_buttons()
         if button:
+            button_press_sound("normal")  # Audio feedback for every button press
             return button
         time.sleep(0.01)
 
@@ -1432,11 +1453,12 @@ def about_mode():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def handle_sacred_input(button):
-    """Handle input with updated menu structure"""
+    """Handle input with updated menu structure and audio feedback"""
     global current_menu, tutorial_active, tutorial_skip_pressed
     
     # If tutorial is active and * is pressed, skip it
     if tutorial_active and button == '*':
+        button_press_sound("special")  # Special sound for skipping
         tutorial_skip_pressed = True
         return True
     
@@ -1446,17 +1468,22 @@ def handle_sacred_input(button):
     
     if current_menu == "main":
         if button == '1':
+            button_press_sound("select")  # Entering elements menu
             show_elements_menu()
         elif button == '2':
+            button_press_sound("select")  # Entering sound mode
             sound_mode()
             show_main_menu()
         elif button == '3':
+            button_press_sound("select")  # Entering settings
             settings_mode()
             show_main_menu()
         elif button == '4':
+            button_press_sound("select")  # Entering about
             about_mode()
             show_main_menu()
         elif button == '5':
+            button_press_sound("special")  # Exiting - special sound
             return False  # Exit
         elif button == '6':
             # Future expansion slot
@@ -1467,18 +1494,23 @@ def handle_sacred_input(button):
             show_main_menu()
     elif current_menu == "elements":
         if button == '1':
+            button_press_sound("select")  # Entering fire mode
             fire_mode()
             show_main_menu()
         elif button == '2':
+            button_press_sound("select")  # Entering water mode
             water_mode()
             show_main_menu()
         elif button == '3':
+            button_press_sound("select")  # Entering earth mode
             earth_mode()
             show_main_menu()
         elif button == '4':
+            button_press_sound("select")  # Entering air mode
             air_mode()
             show_main_menu()
         elif button == '*':
+            button_press_sound("back")  # Going back - different sound
             show_main_menu()  # Return to main menu
     
     return True
