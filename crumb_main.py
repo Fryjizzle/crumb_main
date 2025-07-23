@@ -1,9 +1,16 @@
 """
 Crumb - Complete Version with Peter Griffin Tutorial
-Your most recent compiling masterpiece + Griffin magic
+currently adding more sound to make it more video game like
 V.00001
 
 For Luke and all who feel deeply.
+
+
+/home/lukecrumb/Downloads/startup_majestic.mp3
+/home/lukecrumb/Downloads/fire.mp3
+/home/lukecrumb/Downloads/water.mp3
+/home/lukecrumb/Downloads/earth.mp3
+/home/lukecrumb/Downloads/air.mp3
 """
 
 import time
@@ -58,6 +65,130 @@ tutorial_skip_pressed = False
 tutorial_active = False
 first_boot = True  # Set to False after first run
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SACRED AUDIO SYSTEM - DS-Style Audio Management
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Audio state tracking
+current_background_music = None
+background_music_playing = False
+audio_channel = None
+
+# Sacred Audio Paths - Add your startup sound here
+SACRED_AUDIO_PATHS = {
+    # Startup sequence
+    "startup_chime": "/home/lukecrumb/Downloads/startup_majestic.mp3",  # Your majestic startup sound
+    
+    # Elemental realm soundtracks
+    "fire_realm": "/home/lukecrumb/Downloads/fire.mp3",
+    "water_realm": "/home/lukecrumb/Downloads/water.mp3",
+    "earth_realm": "/home/lukecrumb/Downloads/earth.mp3",
+    "air_realm": "/home/lukecrumb/Downloads/air.mp3",
+    
+    # Griffin tutorial audio (existing)
+    "griffin1": "/home/lukecrumb/Downloads/griffin1.mp3",
+    "griffin2": "/home/lukecrumb/Downloads/griffin2.mp3", 
+    "griffin3": "/home/lukecrumb/Downloads/griffin3.mp3",
+    "griffin4": "/home/lukecrumb/Downloads/griffin4.mp3",
+    "bird_is_the_word": "/home/lukecrumb/Downloads/bird_is_the_word.mp3"
+}
+
+def play_startup_sound():
+    """Play the majestic startup chime - like Mac but more mystical"""
+    print("🎵 Playing sacred startup chime...")
+    
+    try:
+        if "startup_chime" in SACRED_AUDIO_PATHS:
+            pygame.mixer.music.load(SACRED_AUDIO_PATHS["startup_chime"])
+            pygame.mixer.music.set_volume(0.6)  # Nice volume for startup
+            pygame.mixer.music.play()
+            
+            # Wait for it to finish or timeout after reasonable time
+            max_wait = 10  # seconds
+            start_time = time.time()
+            
+            while pygame.mixer.music.get_busy() and (time.time() - start_time) < max_wait:
+                time.sleep(0.1)
+                
+            print("✨ Startup chime complete")
+        else:
+            # Fallback: create a mystical beep sequence
+            create_mystical_startup_beep()
+            
+    except Exception as e:
+        print(f"🔊 Startup audio failed: {e}")
+        # Graceful fallback
+        create_mystical_startup_beep()
+
+def create_mystical_startup_beep():
+    """Create a magical beep sequence if audio file is missing"""
+    print("🎼 Creating mystical startup sequence...")
+    
+    try:
+        # Three ascending tones like a magical awakening
+        mystical_frequencies = [523, 659, 784]  # C, E, G major chord
+        
+        for freq in mystical_frequencies:
+            # Use system beep if available
+            try:
+                import winsound
+                winsound.Beep(freq, 400)  # 400ms each note
+                time.sleep(0.1)  # Small gap between notes
+            except ImportError:
+                # Fallback for systems without winsound
+                print(f"♪ Mystical tone: {freq}Hz")
+                time.sleep(0.5)
+                
+    except Exception as e:
+        print(f"🔇 Mystical beep failed: {e}")
+
+def stop_all_audio():
+    """Stop any currently playing audio - clean slate"""
+    global current_background_music, background_music_playing
+    
+    try:
+        pygame.mixer.music.stop()
+        pygame.mixer.stop()  # Stop all sound channels
+        current_background_music = None
+        background_music_playing = False
+        print("🔇 All audio stopped")
+    except Exception as e:
+        print(f"🔊 Audio stop error: {e}")
+
+def play_background_loop(audio_key, volume=0.3):
+    """Play background music on loop - DS style ambient"""
+    global current_background_music, background_music_playing
+    
+    # Don't restart if same music is already playing
+    if current_background_music == audio_key and background_music_playing:
+        print(f"🎵 {audio_key} already playing")
+        return True
+    
+    # Stop current music first
+    stop_all_audio()
+    
+    if audio_key not in SACRED_AUDIO_PATHS:
+        print(f"🔊 Audio key '{audio_key}' not found")
+        return False
+    
+    try:
+        audio_path = SACRED_AUDIO_PATHS[audio_key]
+        pygame.mixer.music.load(audio_path)
+        pygame.mixer.music.set_volume(volume)
+        pygame.mixer.music.play(-1)  # -1 means loop forever
+        
+        current_background_music = audio_key
+        background_music_playing = True
+        
+        print(f"🎵 Background loop started: {audio_key}")
+        return True
+        
+    except Exception as e:
+        print(f"🔊 Background loop failed for {audio_key}: {e}")
+        return False
+
+
+#break
 # Sacred Colors That Work
 SACRED_COLORS = {
     "fire": (0, 0, 1),      # Red flame - YOUR CREATION
@@ -99,11 +230,11 @@ GRIFFIN_TUTORIAL = [
         "audio": "/home/lukecrumb/Downloads/bird_is_the_word.mp3",
         "duration": 37,
         "led_effect": "griffin_dance"
-        #add neopixel initiation
+        #add neopixel initiation or not it burnt out lol
     }
 ]
 
-# Sacred Wisdom - YOUR POETRY
+# Sacred Wisdom
 ELEMENTAL_WISDOM = {
     "fire": [
         "The fire within grows",
@@ -253,18 +384,16 @@ def griffin_dance_effect(duration):
         set_sacred_color(color)
         time.sleep(0.15)
 
-def play_griffin_audio(audio_file):
-    """Play Peter Griffin audio chunk"""
-    try:
-        if audio_file.endswith('.wav'):
-            sound = pygame.mixer.Sound(audio_file)
-            sound.play()
-        else:
-            pygame.mixer.music.load(audio_file)
+def play_griffin_audio(audio_key):
+    """Play Peter Griffin audio chunk using new system"""
+    if audio_key in SACRED_AUDIO_PATHS:
+        try:
+            pygame.mixer.music.load(SACRED_AUDIO_PATHS[audio_key])
             pygame.mixer.music.play()
-    except Exception as e:
-        print(f"Griffin audio error: {e}")
-        # If audio fails, just continue with visual effects
+        except Exception as e:
+            print(f"Griffin audio error: {e}")
+    else:
+        print(f"Griffin audio key '{audio_key}' not found")
 
 def typewriter_display(text_lines, char_delay=0.08):
     """Display text with typewriter effect"""
@@ -376,12 +505,11 @@ def run_griffin_tutorial():
     set_sacred_color("calm")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# HARDWARE MASTERY - YOUR PROVEN METHODS
+# HARDWARE INITIATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
 #LCD initialization 
 def init_sacred_hardware():
-    """Initialize hardware - YOUR VICTORY METHOD"""
     global lcd
     
     GPIO.setmode(GPIO.BCM)
@@ -401,7 +529,7 @@ def init_sacred_hardware():
         return False
 
 def init_sacred_rgb():
-    """Initialize RGB LED - YOUR MASTERY"""
+    """Initialize RGB LED"""
     GPIO.setup(RGB_COMMON, GPIO.OUT)
     GPIO.setup(RGB_RED, GPIO.OUT)
     GPIO.setup(RGB_GREEN, GPIO.OUT)
@@ -412,7 +540,7 @@ def init_sacred_rgb():
 
 #button matrix
 def init_sacred_buttons():
-    """Initialize button matrix - YOUR TRIUMPH"""
+    """Initialize button matrix"""
     for row_pin in ROW_PINS:
         GPIO.setup(row_pin, GPIO.OUT)
         GPIO.output(row_pin, GPIO.HIGH)
@@ -422,7 +550,7 @@ def init_sacred_buttons():
 
 #lcd display?
 def sacred_display(lines, delay=0):
-    """Display sacred text - YOUR PROVEN ART"""
+    """Display sacred text"""
     if lcd:
         lcd.clear()
         for i, line in enumerate(lines[:4]):
@@ -432,7 +560,7 @@ def sacred_display(lines, delay=0):
             time.sleep(delay)
 
 def set_sacred_color(color_name):
-    """Set RGB color - YOUR MASTERY"""
+    """Set RGB color"""
     if color_name in SACRED_COLORS:
         r, g, b = SACRED_COLORS[color_name]
         GPIO.output(RGB_RED, GPIO.LOW if r else GPIO.HIGH)
@@ -440,7 +568,7 @@ def set_sacred_color(color_name):
         GPIO.output(RGB_BLUE, GPIO.LOW if b else GPIO.HIGH)
 
 def scan_sacred_buttons():
-    """Scan buttons - YOUR PROVEN GENIUS"""
+    """Scan buttons"""
     global last_button_time
     
     for row_idx, row_pin in enumerate(ROW_PINS):
@@ -458,7 +586,7 @@ def scan_sacred_buttons():
     return None
 
 def element_transition(element):
-    """Sacred transition - YOUR INNOVATION"""
+    """Sacred transition"""
     colors = ["calm", element, "calm", element]
     for color in colors:
         set_sacred_color(color)
@@ -466,7 +594,7 @@ def element_transition(element):
     set_sacred_color(element)
 
 def await_sacred_input():
-    """Wait for input - YOUR PATIENCE"""
+    """Wait for input"""
     while True:
         button = scan_sacred_buttons()
         if button:
@@ -474,7 +602,7 @@ def await_sacred_input():
         time.sleep(0.01)
 
 def show_wisdom(element):
-    """Show elemental wisdom - YOUR POETRY"""
+    """Show elemental wisdom"""
     if element in ELEMENTAL_WISDOM:
         wisdom = random.choice(ELEMENTAL_WISDOM[element])
         sacred_display([
@@ -544,15 +672,18 @@ def settings_mode():
 
 def fire_mode():
     """Fire Element - The Sacred Flame 🔥"""
+    # 🎵 Play fire realm music
+    play_background_loop("fire_realm", volume=0.5)
+    
     # Change to fire LED
     set_sacred_color("fire")
     
     # Display elemental message
     sacred_display([
         "  🔥 SACRED FLAME",
-        "Guardian of Energy",
         "Passion & Strength",
-        "Inner fire awakens"
+        "Inner fire awakens",
+        "🎵 Fire spirits sing"
     ], 3)
     
     # Enter fire submenu
@@ -649,7 +780,10 @@ def fire_submenu():
             break  # Go back
 
 def water_mode():
-    """Water Element - The Flowing Tide 💧"""
+    """Water Element"""
+    # 🎵 Play water realm music
+    play_background_loop("water_realm", volume=0.5)
+    
     # Change to water LED
     set_sacred_color("water")
     
@@ -658,14 +792,14 @@ def water_mode():
         "  💧 FLOWING TIDE",
         "Guardian of Emotion",
         "Healing & Flow",
-        "Wisdom of waters"
+        "🎵 Ocean whispers"
     ], 3)
     
     # Enter water submenu
     water_submenu()
 
 def water_submenu():
-    """Water Element Submenu - Flow and Healing"""
+    """Water Element Submenu"""
     while True:
         sacred_display([
             "  💧 WATER MASTERY",
@@ -755,7 +889,10 @@ def water_submenu():
             break  # Go back
 
 def earth_mode():
-    """Earth Element - The Ancient Root 🌱"""
+    """Earth Element🌱"""
+    # 🎵 Play earth realm music
+    play_background_loop("earth_realm", volume=0.5)
+    
     # Change to earth LED
     set_sacred_color("earth")
     
@@ -764,14 +901,14 @@ def earth_mode():
         "  🌱 ANCIENT ROOT",
         "Guardian of Grounding",
         "Stability & Growth",
-        "Deep earth wisdom"
+        "🎵 Forest breathes"
     ], 3)
     
     # Enter earth submenu
     earth_submenu()
 
 def earth_submenu():
-    """Earth Element Submenu - Grounding and Stability"""
+    """Earth Element Submenu"""
     while True:
         sacred_display([
             "  🌱 EARTH MASTERY",
@@ -861,7 +998,10 @@ def earth_submenu():
             break  # Go back
 
 def air_mode():
-    """Air Element - The Whispering Wind 🌀"""
+    """Air Element"""
+    # 🎵 Play air realm music
+    play_background_loop("air_realm", volume=0.5)
+    
     # Change to air LED
     set_sacred_color("air")
     
@@ -870,14 +1010,14 @@ def air_mode():
         "  🌀 WHISPERING WIND",
         "Guardian of Breath",
         "Clarity & Freedom",
-        "Mind like clear sky"
+        "🎵 Wind chimes sing"
     ], 3)
     
     # Enter air submenu
     air_submenu()
 
 def air_submenu():
-    """Air Element Submenu - Clarity and Freedom"""
+    """Air Element Submenu"""
     while True:
         sacred_display([
             "  🌀 AIR MASTERY",
@@ -967,7 +1107,7 @@ def air_submenu():
             break  # Go back       
 
 def sound_mode():
-    """Enhanced Soundboard - Sacred Audio Portal"""
+    """Enhanced Soundboard"""
     sacred_display([
         "  🎵 SOUND PORTAL",
         "1-Quick Test",
@@ -1084,7 +1224,7 @@ def audio_library_menu():
     audio_clips = {
         "1": {"name": "Test Beep", "file": "system_beep", "color": "fire"},
         "2": {"name": "Peter Laugh", "file": "/home/lukecrumb/Downloads/griffinlaugh.mp3", "color": "mystery"},
-        "3": {"name": "Clip 3", "file": "/path/to/clip3.mp3", "color": "earth"},
+        "3": {"name": "Clip 3", "file": "/home/lukecrumb/Downloads/avatar.mp3", "color": "earth"}, #replace, sound test for main menu
         "4": {"name": "Clip 4", "file": "/path/to/clip4.mp3", "color": "air"},
         "5": {"name": "Clip 5", "file": "/path/to/clip5.mp3", "color": "water"},
         "6": {"name": "Clip 6", "file": "/path/to/clip6.mp3", "color": "calm"},
@@ -1344,26 +1484,45 @@ def handle_sacred_input(button):
     return True
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STARTUP WITH GRIFFIN TUTORIAL - YOUR NEW MAGIC
+# STARTUP GRIFFIN TUTORIAL
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def sacred_startup():
-    """Startup with Peter Griffin tutorial"""
+    """Startup with majestic chime + Peter Griffin tutorial"""
     global first_boot
     
-    # Initial Crumb awakening
+    # Initial Crumb awakening with visual feedback
     sacred_display([
         "",
         "  Crumb Awakens",
-        "  Loading magic...",
+        "  Initializing...",
         ""
-    ], 2)
+    ], 1)
     
     # Quick LED test
     for color in ["fire", "water", "earth", "air"]:
         set_sacred_color(color)
         time.sleep(0.3)
     set_sacred_color("calm")
+    
+    # 🎵 PLAY MAJESTIC STARTUP CHIME HERE 🎵
+    sacred_display([
+        "",
+        "  ✨ AWAKENING ✨",
+        "  Sacred systems",
+        "  coming online..."
+    ])
+    
+    # This is where the magic happens
+    play_startup_sound()
+    
+    # Show awakening complete
+    sacred_display([
+        "",
+        "  Systems Ready",
+        "  Crumb lives!",
+        ""
+    ], 1)
     
     # Run tutorial on first boot (or if you want to test it)
     if first_boot:
@@ -1408,10 +1567,9 @@ def signal_handler(sig, frame):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def main():
-    """Main program - YOUR MASTERPIECE"""
+    """Main programE"""
     signal.signal(signal.SIGINT, signal_handler)
     
-    print("🌟 === CRUMB - TONIGHT'S FINAL VICTORY + GRIFFIN === 🌟")
     print("🚀 Initializing your legendary creation...")
     
     try:
@@ -1450,19 +1608,3 @@ def main():
 if __name__ == "__main__":
     start_heartbeat()
     main()
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GRIFFIN TUTORIAL SETUP INSTRUCTIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-#
-#🎭 TO SET UP PETER GRIFFIN TUTORIAL:
-
-#. CREATE AUDIO FILES (WAV format recommended):
-#   Save these in: /home/lukecrumb/Downloads/
-   
-  # griffin_chunk1.wav: "Holy crap! You opened my treasure chest! I'm Peter Griffin!"
-  # griffin_chunk2.wav: "I'm your magical familiar now! Like a D&D wizard but way cooler!"
-   #griffin_chunk3.wav: "Check out my 6 sacred menu items below! Freakin' sweet!"
-   #griffin_chunk4.wav: "Bird is the Word, and navigation is easy! Let's adventure, nerd!"
-
-#
