@@ -6,11 +6,7 @@ V.00001
 For Luke and all who feel deeply.
 
 
-/home/lukecrumb/Downloads/startup_majestic.mp3
-/home/lukecrumb/Downloads/fire.mp3
-/home/lukecrumb/Downloads/water.mp3
-/home/lukecrumb/Downloads/earth.mp3
-/home/lukecrumb/Downloads/air.mp3
+
 """
 
 import time
@@ -691,441 +687,175 @@ def settings_mode():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
+# ═══════════════════════════════════════════════════════════════════
+# ELEMENTAL REALMS - Sacred Music Foundation
+# ═══════════════════════════════════════════════════════════════════
+# A mystical foundation for elemental exploration through sound
+# Each realm opens with its sacred tones, then awaits expansion
+
 def fire_mode():
-    """Fire Element - The Sacred Flame 🔥"""
-    # 🎵 Play fire realm music
-    play_background_loop("fire_realm", volume=0.5)
-    
-    # Change to fire LED
+    """🔥 Fire Element - The Sacred Flame"""
+    # Sacred flame ignition
     set_sacred_color("fire")
     
-    # Display elemental message
+    # Welcome to the fire realm
     sacred_display([
         "  🔥 SACRED FLAME",
         "Passion & Strength",
         "Inner fire awakens",
-        "🎵 Fire spirits sing"
-    ], 3)
+        "🎵 Entering realm..."
+    ], 2)
     
-    # Enter fire submenu
+    # Enter fire's sacred space
     fire_submenu()
 
 def fire_submenu():
-    """Fire Element Submenu - Power and Transformation"""
+    """Fire Element - Sacred Music & Future Expansion"""
+    # 🎵 Begin the fire realm's sacred song
+    play_background_loop("/home/lukecrumb/Downloads/fire.mp3", volume=0.6)
+    
+    # Display the listening space
+    sacred_display([
+        "  🔥 FIRE REALM",
+        "",
+        "Sacred flames dance",
+        "* to return"
+    ])
+    
+    # Hold the sacred space - music plays, LEDs glow
+    set_sacred_color("fire")
+    
+    # Simple exit mechanism
     while True:
-        sacred_display([
-            "  🔥 FIRE MASTERY",
-            "1-Dragon Mantras",
-            "2-Power Focus",
-            "3-Sound  *-Back"
-        ])
-        set_sacred_color("fire")
-        
         button = await_sacred_input()
-        
-        if button == '1':
-            # Dragon Mantras - Repeating affirmations
-            fire_mantras = [
-                "I am the flame that never dies",
-                "Power flows through my veins",
-                "I transform challenges to strength",
-                "My passion lights the way",
-                "I am fierce and unstoppable"
-            ]
-            
-            sacred_display([
-                "  DRAGON MANTRAS",
-                "Power affirmations",
-                "Feel the fire grow",
-                "# to stop"
-            ])
-            
-            mantra_count = 0
-            while True:
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-                current_mantra = fire_mantras[mantra_count % len(fire_mantras)]
-                sacred_display([
-                    "  INNER FLAME",
-                    "",
-                    current_mantra,
-                    f"Cycle {(mantra_count // len(fire_mantras)) + 1}"
-                ])
-                set_sacred_color("fire")
-                time.sleep(4)
-                mantra_count += 1
-                
-        elif button == '2':
-            # Power Focus Mode
-            sacred_display([
-                "  POWER FOCUS",
-                "Channel your fire",
-                "into clear intent",
-                "Press to begin"
-            ])
-            await_sacred_input()
-            
-            focus_phases = [
-                "Gather your energy",
-                "Focus on your goal", 
-                "Feel the fire build",
-                "Channel pure power",
-                "You are unstoppable"
-            ]
-            
-            for phase in focus_phases:
-                sacred_display([
-                    "  FOCUS FLAME",
-                    "",
-                    phase,
-                    "Breathe the fire"
-                ])
-                set_sacred_color("fire")
-                time.sleep(5)
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-        elif button == '3':
-            # Sound option
-            sacred_display([
-                "  FIRE SOUNDS",
-                "Sacred flame tones",
-                "would play here",
-                "Press any key..."
-            ])
-            set_sacred_color("fire")
-            await_sacred_input()
-            
-        elif button == '*':
-            break  # Go back
+        if button == '*':
+            stop_all_audio()
+            break
+
+# ═══════════════════════════════════════════════════════════════════
 
 def water_mode():
-    """Water Element"""
-    # 🎵 Play water realm music
-    play_background_loop("water_realm", volume=0.5)
-    
-    # Change to water LED
+    """💧 Water Element - The Flowing Tide"""
+    # Sacred waters stir
     set_sacred_color("water")
     
-    # Display elemental message
+    # Welcome to the water realm
     sacred_display([
         "  💧 FLOWING TIDE",
-        "Guardian of Emotion",
-        "Healing & Flow",
-        "🎵 Ocean whispers"
-    ], 3)
+        "Healing & Flow", 
+        "Waters gather...",
+        "🎵 Entering realm..."
+    ], 2)
     
-    # Enter water submenu
+    # Enter water's sacred space
     water_submenu()
 
 def water_submenu():
-    """Water Element Submenu"""
+    """Water Element - Sacred Music & Future Expansion"""
+    # 🎵 Begin the water realm's sacred song
+    play_background_loop("/home/lukecrumb/Downloads/water.mp3", volume=0.6)
+    
+    # Display the listening space
+    sacred_display([
+        "  💧 WATER REALM",
+        "",
+        "Sacred tides flow",
+        "* to return"
+    ])
+    
+    # Hold the sacred space - music flows, LEDs pulse
+    set_sacred_color("water")
+    
+    # Simple exit mechanism
     while True:
-        sacred_display([
-            "  💧 WATER MASTERY",
-            "1-Flow Mantras",
-            "2-Healing Focus",
-            "3-Sound  *-Back"
-        ])
-        set_sacred_color("water")
-        
         button = await_sacred_input()
-        
-        if button == '1':
-            # Flow Mantras - Emotional healing
-            water_mantras = [
-                "I flow like rivers to the sea",
-                "My emotions are sacred water",
-                "I adapt and overcome all",
-                "Healing flows through me",
-                "I am flexible like water"
-            ]
-            
-            sacred_display([
-                "  FLOW MANTRAS",
-                "Emotional healing",
-                "Let feelings flow",
-                "# to stop"
-            ])
-            
-            mantra_count = 0
-            while True:
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-                current_mantra = water_mantras[mantra_count % len(water_mantras)]
-                sacred_display([
-                    "  HEALING FLOW",
-                    "",
-                    current_mantra,
-                    f"Wave {(mantra_count // len(water_mantras)) + 1}"
-                ])
-                set_sacred_color("water")
-                time.sleep(4)
-                mantra_count += 1
-                
-        elif button == '2':
-            # Healing Focus Mode
-            sacred_display([
-                "  HEALING FOCUS",
-                "Let water cleanse",
-                "and restore you",
-                "Press to begin"
-            ])
-            await_sacred_input()
-            
-            healing_phases = [
-                "Feel the gentle flow",
-                "Release old wounds",
-                "Let healing waters rise",
-                "Cleanse and restore",
-                "You are renewed"
-            ]
-            
-            for phase in healing_phases:
-                sacred_display([
-                    "  HEALING TIDE",
-                    "",
-                    phase,
-                    "Flow with grace"
-                ])
-                set_sacred_color("water")
-                time.sleep(5)
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-        elif button == '3':
-            # Sound option
-            sacred_display([
-                "  WATER SOUNDS",
-                "Ocean waves & rain",
-                "would play here",
-                "Press any key..."
-            ])
-            set_sacred_color("water")
-            await_sacred_input()
-            
-        elif button == '*':
-            break  # Go back
+        if button == '*':
+            stop_all_audio()
+            break
+
+# ═══════════════════════════════════════════════════════════════════
 
 def earth_mode():
-    """Earth Element🌱"""
-    # 🎵 Play earth realm music
-    play_background_loop("earth_realm", volume=0.5)
-    
-    # Change to earth LED
+    """🌱 Earth Element - The Ancient Root"""
+    # Sacred earth awakens
     set_sacred_color("earth")
     
-    # Display elemental message
+    # Welcome to the earth realm
     sacred_display([
         "  🌱 ANCIENT ROOT",
-        "Guardian of Grounding",
-        "Stability & Growth",
-        "🎵 Forest breathes"
-    ], 3)
+        "Grounding & Growth",
+        "Deep roots stir...",
+        "🎵 Entering realm..."
+    ], 2)
     
-    # Enter earth submenu
+    # Enter earth's sacred space
     earth_submenu()
 
 def earth_submenu():
-    """Earth Element Submenu"""
+    """Earth Element - Sacred Music & Future Expansion"""
+    # 🎵 Begin the earth realm's sacred song
+    play_background_loop("/home/lukecrumb/Downloads/earth.mp3", volume=0.6)
+    
+    # Display the listening space
+    sacred_display([
+        "  🌱 EARTH REALM",
+        "",
+        "Ancient wisdom",
+        "* to return"
+    ])
+    
+    # Hold the sacred space - music grounds, LEDs breathe
+    set_sacred_color("earth")
+    
+    # Simple exit mechanism
     while True:
-        sacred_display([
-            "  🌱 EARTH MASTERY",
-            "1-Root Mantras",
-            "2-Grounding Focus",
-            "3-Sound  *-Back"
-        ])
-        set_sacred_color("earth")
-        
         button = await_sacred_input()
-        
-        if button == '1':
-            # Root Mantras - Stability and grounding
-            earth_mantras = [
-                "I am rooted in ancient strength",
-                "The earth supports my every step",
-                "I grow slowly and surely",
-                "My foundation is unshakeable",
-                "I am connected to all life"
-            ]
-            
-            sacred_display([
-                "  ROOT MANTRAS",
-                "Grounding wisdom",
-                "Feel your roots",
-                "# to stop"
-            ])
-            
-            mantra_count = 0
-            while True:
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-                current_mantra = earth_mantras[mantra_count % len(earth_mantras)]
-                sacred_display([
-                    "  ANCIENT ROOT",
-                    "",
-                    current_mantra,
-                    f"Growth {(mantra_count // len(earth_mantras)) + 1}"
-                ])
-                set_sacred_color("earth")
-                time.sleep(4)
-                mantra_count += 1
-                
-        elif button == '2':
-            # Grounding Focus Mode
-            sacred_display([
-                "  GROUNDING FOCUS",
-                "Connect deeply",
-                "to earth's wisdom",
-                "Press to begin"
-            ])
-            await_sacred_input()
-            
-            grounding_phases = [
-                "Feel your feet on earth",
-                "Roots grow from your spine",
-                "Draw up earth energy",
-                "Stand in your power",
-                "You are grounded"
-            ]
-            
-            for phase in grounding_phases:
-                sacred_display([
-                    "  EARTH WISDOM",
-                    "",
-                    phase,
-                    "Sink deeper roots"
-                ])
-                set_sacred_color("earth")
-                time.sleep(5)
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-        elif button == '3':
-            # Sound option
-            sacred_display([
-                "  EARTH SOUNDS",
-                "Forest & mountain",
-                "would play here", 
-                "Press any key..."
-            ])
-            set_sacred_color("earth")
-            await_sacred_input()
-            
-        elif button == '*':
-            break  # Go back
+        if button == '*':
+            stop_all_audio()
+            break
+
+# ═══════════════════════════════════════════════════════════════════
 
 def air_mode():
-    """Air Element"""
-    # 🎵 Play air realm music
-    play_background_loop("air_realm", volume=0.5)
-    
-    # Change to air LED
+    """🌀 Air Element - The Whispering Wind"""
+    # Sacred winds gather
     set_sacred_color("air")
     
-    # Display elemental message
+    # Welcome to the air realm
     sacred_display([
         "  🌀 WHISPERING WIND",
-        "Guardian of Breath",
         "Clarity & Freedom",
-        "🎵 Wind chimes sing"
-    ], 3)
+        "Winds gathering...",
+        "🎵 Entering realm..."
+    ], 2)
     
-    # Enter air submenu
+    # Enter air's sacred space
     air_submenu()
 
 def air_submenu():
-    """Air Element Submenu"""
+    """Air Element - Sacred Music & Future Expansion"""
+    # 🎵 Begin the air realm's sacred song
+    play_background_loop("/home/lukecrumb/Downloads/air.mp3", volume=0.6)
+    
+    # Display the listening space
+    sacred_display([
+        "  🌀 AIR REALM",
+        "",
+        "Sacred winds sing",
+        "* to return"
+    ])
+    
+    # Hold the sacred space - music soars, LEDs shimmer
+    set_sacred_color("air")
+    
+    # Simple exit mechanism
     while True:
-        sacred_display([
-            "  🌀 AIR MASTERY",
-            "1-Wind Mantras",
-            "2-Clarity Focus",
-            "3-Sound  *-Back"
-        ])
-        set_sacred_color("air")
-        
         button = await_sacred_input()
-        
-        if button == '1':
-            # Wind Mantras - Mental clarity
-            air_mantras = [
-                "My mind is clear as mountain air",
-                "Thoughts flow like gentle breeze",
-                "I am free as the wind",
-                "Clarity comes with each breath",
-                "I soar above all obstacles"
-            ]
-            
-            sacred_display([
-                "  WIND MANTRAS",
-                "Mental clarity",
-                "Clear the mind",
-                "# to stop"
-            ])
-            
-            mantra_count = 0
-            while True:
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-                current_mantra = air_mantras[mantra_count % len(air_mantras)]
-                sacred_display([
-                    "  CLEAR MIND",
-                    "",
-                    current_mantra,
-                    f"Breeze {(mantra_count // len(air_mantras)) + 1}"
-                ])
-                set_sacred_color("air")
-                time.sleep(4)
-                mantra_count += 1
-                
-        elif button == '2':
-            # Clarity Focus Mode
-            sacred_display([
-                "  CLARITY FOCUS",
-                "Let the wind clear",
-                "all mental fog",
-                "Press to begin"
-            ])
-            await_sacred_input()
-            
-            clarity_phases = [
-                "Feel the gentle breeze",
-                "Let thoughts scatter",
-                "Mind becomes clear sky",
-                "Perfect mental clarity",
-                "You see with wisdom"
-            ]
-            
-            for phase in clarity_phases:
-                sacred_display([
-                    "  WIND WISDOM",
-                    "",
-                    phase,
-                    "Breathe in clarity"
-                ])
-                set_sacred_color("air")
-                time.sleep(5)
-                if scan_sacred_buttons() == '#':
-                    break
-                    
-        elif button == '3':
-            # Sound option
-            sacred_display([
-                "  AIR SOUNDS",
-                "Wind & bird songs",
-                "would play here",
-                "Press any key..."
-            ])
-            set_sacred_color("air")
-            await_sacred_input()
-            
-        elif button == '*':
-            break  # Go back       
+        if button == '*':
+            stop_all_audio()
+            break
+
+
 
 def sound_mode():
     """Enhanced Soundboard"""
