@@ -124,22 +124,21 @@ class CrumbUI:
         title_y = 80
         # Create glow layers for depth
         for i in range(5, 0, -1):
-            glow_size = self.fonts['large_symbol'][1] + (i * 3)
-            glow_alpha = 0.3 - (i * 0.05)
+            glow_size = 36 + (i * 3)  # Base size + glow increment
             self.hub_canvas.create_text(512, title_y, text="✧ CRUMB ✧",
                                       font=('Arial', glow_size, 'bold'),
                                       fill=self.colors['gold'], anchor='center')
         
         # Main title
         self.hub_canvas.create_text(512, title_y, text="✧ CRUMB ✧",
-                                  font=self.fonts['large_symbol'],
+                                  font=('Arial', 36, 'bold'),
                                   fill=self.colors['ethereal'], anchor='center')
         
         # Subtitle with mystical particles
         subtitle_y = title_y + 60
         self.hub_canvas.create_text(512, subtitle_y, 
                                   text="Sacred Companion • Mystical Interface",
-                                  font=self.fonts['subtitle'],
+                                  font=('Arial', 16),
                                   fill=self.colors['sage'], anchor='center')
         
         # Create floating navigation orbs instead of buttons
