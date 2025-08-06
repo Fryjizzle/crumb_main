@@ -95,16 +95,26 @@ class CrumbUI:
                 'large_symbol': ('Arial', 36, 'bold')
             }
 
-    def setup_audio(self):
+def setup_audio(self):
         """Initialize audio system"""
         try:
-            pygame.mixer.init()
+            # Force pygame to use USB speaker (card 2)
+            os.environ['SDL_AUDIODRIVER'] = 'alsa'
+            os.environ['ALSA_PCM_DEVICE'] = '2'
+            
             pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
+            pygame.mixer.init()
             self.audio_enabled = True
-            print("✧ Audio system initialized ✧")
+            print("✧ Audio system initialized with USB speaker ✧")
         except Exception as e:
             print(f"Audio initialization error: {e}")
-            self.audio_enabled = False
+            # Try without USB forcing
+            try:
+                pygame.mixer.init()
+                self.audio_enabled = True
+                print("✧ Audio system initialized with default device ✧")
+            except:
+                self.audio_enabled = False
 
     def play_startup_music(self):
         """Play startup music"""
