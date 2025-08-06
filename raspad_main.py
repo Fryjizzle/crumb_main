@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🌀 Crumb UI - Minimal Sacred Interface v0.1
-A clean, reliable menu system for continuous testing
+A clean, reliable menu system with music and sounds
 Designed for RasPad touchscreen with sacred intention
 """
 
@@ -46,10 +46,8 @@ class CrumbUI:
             self.current_screen = "hub"
             self.last_activity = datetime.now()
             
-            # Setup fonts with error handling
+            # Setup fonts and audio
             self.setup_fonts()
-            
-            # Initialize audio
             self.setup_audio()
             
             # Create main container
@@ -119,10 +117,32 @@ class CrumbUI:
                 pygame.mixer.music.load(music_file)
                 pygame.mixer.music.set_volume(0.3)
                 pygame.mixer.music.play(-1)  # Loop forever
+                print("✧ Startup music playing ✧")
             else:
                 print(f"Startup music not found: {music_file}")
         except Exception as e:
             print(f"Music play error: {e}")
+
+    def play_sound(self, sound_name):
+        """Play individual sound effects"""
+        if not self.audio_enabled:
+            return
+        try:
+            sound_file = f"assets/sounds/{sound_name}.wav"
+            if os.path.exists(sound_file):
+                sound = pygame.mixer.Sound(sound_file)
+                sound.play()
+                print(f"✧ Playing {sound_name} ✧")
+            else:
+                print(f"Sound not found: {sound_file}")
+                # Play placeholder beep
+                self.play_placeholder_beep()
+        except Exception as e:
+            print(f"Sound play error: {e}")
+
+    def play_placeholder_beep(self):
+        """Generate a simple beep for missing sounds"""
+        print("♫ Beep! (placeholder sound) ♫")
 
     def create_all_screens(self):
         """Create all interface screens with error handling"""
@@ -221,31 +241,6 @@ class CrumbUI:
                 'phase': random.uniform(0, 6.28)
             })
 
-    def create_crumb_character(self):
-        """Draw a simple 8-bit Crumb character that jumps"""
-        char_x, char_y = 80, 450
-        
-        # Body (simple rectangle)
-        self.crumb_body = self.hub_canvas.create_rectangle(
-            char_x-8, char_y-16, char_x+8, char_y+8, 
-            fill=self.colors['gold'], outline=self.colors['ethereal'], width=2)
-        
-        # Head (circle)
-        self.crumb_head = self.hub_canvas.create_oval(
-            char_x-6, char_y-24, char_x+6, char_y-12,
-            fill=self.colors['sage'], outline=self.colors['gold'], width=1)
-        
-        # Eyes (tiny dots)
-        self.crumb_eye1 = self.hub_canvas.create_oval(char_x-3, char_y-20, char_x-1, char_y-18, fill='white')
-        self.crumb_eye2 = self.hub_canvas.create_oval(char_x+1, char_y-20, char_x+3, char_y-18, fill='white')
-        
-        # Store character data
-        self.crumb_char = {
-            'x': char_x, 'base_y': char_y, 'y': char_y,
-            'jump_phase': 0,
-            'parts': [self.crumb_body, self.crumb_head, self.crumb_eye1, self.crumb_eye2]
-        }
-
     def create_navigation_orbs(self):
         """Create beautiful floating orb navigation instead of rectangular buttons"""
         # Central mystical pattern
@@ -314,16 +309,12 @@ class CrumbUI:
         self.central_symbol = self.hub_canvas.create_text(center_x, center_y, text="✧",
                                                         font=('Arial', 32, 'bold'),
                                                         fill=self.colors['gold'], anchor='center')
-        
-        # Create Crumb character
-        self.create_crumb_character()
 
     def start_hub_animations(self):
         """Start all the beautiful ambient animations"""
         self.animate_background()
         self.animate_orbs()
         self.animate_central_core()
-        self.animate_crumb_character()
 
     def animate_background(self):
         """Animate floating background elements"""
@@ -410,34 +401,6 @@ class CrumbUI:
                 
         except Exception as e:
             print(f"Central core animation error: {e}")
-
-    def animate_crumb_character(self):
-        """Make Crumb character jump up and down"""
-        try:
-            import math
-            
-            # Simple jumping motion
-            self.crumb_char['jump_phase'] += 0.08
-            jump_offset = abs(math.sin(self.crumb_char['jump_phase'])) * 15
-            new_y = self.crumb_char['base_y'] - jump_offset
-            
-            # Move all character parts
-            for part in self.crumb_char['parts']:
-                current_coords = self.hub_canvas.coords(part)
-                if len(current_coords) == 4:  # Rectangle or oval
-                    y_diff = new_y - self.crumb_char['y']
-                    self.hub_canvas.coords(part, 
-                        current_coords[0], current_coords[1] + y_diff,
-                        current_coords[2], current_coords[3] + y_diff)
-            
-            self.crumb_char['y'] = new_y
-            
-            # Continue animation
-            if hasattr(self, 'hub_canvas') and self.current_screen == 'hub':
-                self.root.after(60, self.animate_crumb_character)
-                
-        except Exception as e:
-            print(f"Character animation error: {e}")
 
     def orb_click_effect(self, screen_name):
         """Create magical click effect and navigate"""
@@ -545,7 +508,7 @@ class CrumbUI:
         self.screens['elemental'] = elemental
 
     def create_soundboard_screen(self):
-        """🎵 Sacred Soundboard - Expression tools (placeholder)"""
+        """🎵 Sacred Soundboard - Expression tools with real sounds"""
         soundboard = tk.Frame(self.main_frame, bg=self.colors['deep'])
         
         # Header
@@ -555,20 +518,20 @@ class CrumbUI:
         content_frame = tk.Frame(soundboard, bg=self.colors['deep'])
         content_frame.pack(expand=True, fill='both', padx=40, pady=20)
         
-        # Sound buttons grid
+        # Sound buttons grid - 9 sounds ready for audio files
         sounds = [
-            ("💚", "Happy", self.colors['sage']),
-            ("😔", "Sad", self.colors['mystic']),
-            ("😰", "Stress", self.colors['fire']),
-            ("🤗", "Comfort", self.colors['water']),
-            ("⚡", "Energy", self.colors['ethereal']),
-            ("🌙", "Calm", self.colors['aether']),
-            ("🍎", "Need", self.colors['earth']),
-            ("💭", "Think", self.colors['air']),
-            ("❤️", "Love", self.colors['gold'])
+            ("💚", "Happy", self.colors['sage'], "happy"),
+            ("😔", "Sad", self.colors['mystic'], "sad"),
+            ("😰", "Stress", self.colors['fire'], "stress"),
+            ("🤗", "Comfort", self.colors['water'], "comfort"),
+            ("⚡", "Energy", self.colors['ethereal'], "energy"),
+            ("🌙", "Calm", self.colors['aether'], "calm"),
+            ("🍎", "Need", self.colors['earth'], "need"),
+            ("💭", "Think", self.colors['air'], "think"),
+            ("❤️", "Love", self.colors['gold'], "love")
         ]
         
-        for i, (emoji, label, color) in enumerate(sounds):
+        for i, (emoji, label, color, sound_file) in enumerate(sounds):
             row, col = i // 3, i % 3
             
             btn = tk.Button(content_frame,
@@ -580,7 +543,7 @@ class CrumbUI:
                            width=8,
                            height=3,
                            bd=0,
-                           command=lambda l=label: self.play_sound_placeholder(l))
+                           command=lambda f=sound_file: self.play_sound(f))
             btn.grid(row=row, column=col, padx=20, pady=15, sticky='nsew')
         
         # Configure grid
@@ -745,14 +708,6 @@ class CrumbUI:
         except Exception as e:
             print(f"Element activation error: {e}")
 
-    def play_sound_placeholder(self, sound_name):
-        """🎵 Placeholder sound playing"""
-        try:
-            print(f"♫ Playing {sound_name} sound ♫")
-            self.show_temporary_message(f"♫ {sound_name} ♫\nSound Played", self.colors['ethereal'])
-        except Exception as e:
-            print(f"Sound play error: {e}")
-
     def handle_setting(self, setting_name):
         """⚙️ Placeholder settings handler"""
         try:
@@ -852,6 +807,8 @@ class CrumbUI:
         """🚪 Exit the sacred space gracefully"""
         try:
             print("✧ Sacred journey ending gracefully ✧")
+            if self.audio_enabled:
+                pygame.mixer.quit()
             self.root.quit()
         except:
             print("✧ Force closing ✧")
@@ -862,11 +819,6 @@ class CrumbUI:
         try:
             print("✧ Crumb UI v0.1 - Sacred Interface Starting ✧")
             print("Triple-tap top-left corner to exit")
-            
-            # Set up global error handler
-            def handle_tk_error(error):
-                self.handle_critical_error("Tkinter", error)
-                return True
             
             # Start the main loop with error handling
             while True:
