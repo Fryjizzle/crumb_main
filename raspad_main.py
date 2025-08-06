@@ -518,7 +518,7 @@ class CrumbUI:
         content_frame = tk.Frame(soundboard, bg=self.colors['deep'])
         content_frame.pack(expand=True, fill='both', padx=40, pady=20)
         
-        # Sound buttons grid - 9 sounds ready for audio files
+        # Sound buttons grid - 9 sounds ready for MP3 files
         sounds = [
             ("💚", "Happy", self.colors['sage'], "happy"),
             ("😔", "Sad", self.colors['mystic'], "sad"),
