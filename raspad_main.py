@@ -95,7 +95,7 @@ class CrumbUI:
                 'large_symbol': ('Arial', 36, 'bold')
             }
 
-def setup_audio(self):
+    def setup_audio(self):
         """Initialize audio system"""
         try:
             # Force pygame to use USB speaker (card 2)
