@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🌀 Crumb UI - Minimal Sacred Interface v0.1
+🌀 Crumb UI - Minimal Sacred Interface v0.11
 A clean, reliable menu system with music and sounds
 Designed for RasPad touchscreen with sacred intention
 """
@@ -13,6 +13,7 @@ import math
 import random
 import pygame
 import os
+import threading
 from datetime import datetime
 
 class CrumbUI:
@@ -26,6 +27,12 @@ class CrumbUI:
             # Configure for touchscreen (RasPad dimensions)
             self.root.geometry("1024x600")
             self.root.attributes('-fullscreen', True)
+            self.root.attributes('-topmost', True)
+            self.root.focus_set()
+            
+            # Remove window decorations and ensure full coverage
+            self.root.overrideredirect(True)
+            self.root.configure(cursor="none")  # Hide cursor for clean look
             
             # Sacred color palette - simplified
             self.colors = {
