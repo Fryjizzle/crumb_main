@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🌀 Crumb UI - Minimal Sacred Interface v0.11
-A clean, reliable menu system with music and sounds
+🌀 Crumb UI - Minimal Sacred Interface v0.1
+A clean, reliable menu system for continuous testing
 Designed for RasPad touchscreen with sacred intention
 """
 
@@ -9,11 +9,8 @@ import tkinter as tk
 from tkinter import font
 import sys
 import traceback
-import math
-import random
 import pygame
 import os
-import threading
 from datetime import datetime
 
 class CrumbUI:
@@ -27,12 +24,6 @@ class CrumbUI:
             # Configure for touchscreen (RasPad dimensions)
             self.root.geometry("1024x600")
             self.root.attributes('-fullscreen', True)
-            self.root.attributes('-topmost', True)
-            self.root.focus_set()
-            
-            # Remove window decorations and ensure full coverage
-            self.root.overrideredirect(True)
-            self.root.configure(cursor="none")  # Hide cursor for clean look
             
             # Sacred color palette - simplified
             self.colors = {
@@ -107,7 +98,8 @@ class CrumbUI:
     def setup_audio(self):
         """Initialize audio system"""
         try:
-            pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+            pygame.mixer.init()
+            pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
             self.audio_enabled = True
             print("✧ Audio system initialized ✧")
         except Exception as e:
@@ -115,41 +107,20 @@ class CrumbUI:
             self.audio_enabled = False
 
     def play_startup_music(self):
-        """Play mystical startup music"""
+        """Play startup music"""
         if not self.audio_enabled:
             return
         try:
-            music_file = "assets/sounds/startup_mystical.wav"
-            if os.path.exists(music_file):
-                pygame.mixer.music.load(music_file)
-                pygame.mixer.music.set_volume(0.3)
+            startup_file = "/home/pi/Downloads/startup.mp3"
+            if os.path.exists(startup_file):
+                pygame.mixer.music.load(startup_file)
+                pygame.mixer.music.set_volume(0.6)
                 pygame.mixer.music.play(-1)  # Loop forever
                 print("✧ Startup music playing ✧")
             else:
-                print(f"Startup music not found: {music_file}")
+                print(f"Startup music not found: {startup_file}")
         except Exception as e:
             print(f"Music play error: {e}")
-
-    def play_sound(self, sound_name):
-        """Play individual sound effects"""
-        if not self.audio_enabled:
-            return
-        try:
-            sound_file = f"assets/sounds/{sound_name}.wav"
-            if os.path.exists(sound_file):
-                sound = pygame.mixer.Sound(sound_file)
-                sound.play()
-                print(f"✧ Playing {sound_name} ✧")
-            else:
-                print(f"Sound not found: {sound_file}")
-                # Play placeholder beep
-                self.play_placeholder_beep()
-        except Exception as e:
-            print(f"Sound play error: {e}")
-
-    def play_placeholder_beep(self):
-        """Generate a simple beep for missing sounds"""
-        print("♫ Beep! (placeholder sound) ♫")
 
     def create_all_screens(self):
         """Create all interface screens with error handling"""
@@ -170,294 +141,59 @@ class CrumbUI:
                 self.create_error_screen(screen_name, e)
 
     def create_hub_screen(self):
-        """🧿 The Sacred Hub - Gateway to all realms with mystical animations"""
-        hub = tk.Frame(self.main_frame, bg=self.colors['void'])
+        """🧿 The Sacred Hub - Gateway to all realms"""
+        hub = tk.Frame(self.main_frame, bg=self.colors['deep'])
         
-        # Animated background canvas
-        self.hub_canvas = tk.Canvas(hub, bg=self.colors['void'], highlightthickness=0)
-        self.hub_canvas.pack(fill='both', expand=True)
+        # Title section
+        title_frame = tk.Frame(hub, bg=self.colors['deep'])
+        title_frame.pack(pady=40)
         
-        # Create mystical background elements
-        self.create_mystical_background()
+        title = tk.Label(title_frame, text="✧ CRUMB ✧", 
+                        font=self.fonts['large_symbol'],
+                        fg=self.colors['gold'],
+                        bg=self.colors['deep'])
+        title.pack()
         
-        # Floating title with glow effect
-        title_y = 80
-        # Create glow layers for depth
-        for i in range(5, 0, -1):
-            glow_size = 36 + (i * 3)  # Base size + glow increment
-            self.hub_canvas.create_text(512, title_y, text="✧ CRUMB ✧",
-                                      font=('Arial', glow_size, 'bold'),
-                                      fill=self.colors['gold'], anchor='center')
+        subtitle = tk.Label(title_frame, text="Sacred Companion • Testing Interface", 
+                           font=self.fonts['subtitle'],
+                           fg=self.colors['sage'],
+                           bg=self.colors['deep'])
+        subtitle.pack(pady=10)
         
-        # Main title
-        self.hub_canvas.create_text(512, title_y, text="✧ CRUMB ✧",
-                                  font=('Arial', 36, 'bold'),
-                                  fill=self.colors['ethereal'], anchor='center')
+        # Navigation grid
+        nav_frame = tk.Frame(hub, bg=self.colors['deep'])
+        nav_frame.pack(expand=True)
         
-        # Subtitle with mystical particles
-        subtitle_y = title_y + 60
-        self.hub_canvas.create_text(512, subtitle_y, 
-                                  text="Sacred Companion • Mystical Interface",
-                                  font=('Arial', 16),
-                                  fill=self.colors['sage'], anchor='center')
-        
-        # Create floating navigation orbs instead of buttons
-        self.create_navigation_orbs()
-        
-        # Start ambient animations
-        self.start_hub_animations()
-        
-        self.screens['hub'] = hub
-
-    def create_mystical_background(self):
-        """Create animated background with floating particles and energy lines"""
-        # Create floating mystical symbols
-        symbols = ['✧', '◊', '○', '△', '◇', '☽', '☾', '✦', '✧']
-        self.background_elements = []
-        
-        for i in range(25):
-            x = random.randint(50, 974)
-            y = random.randint(50, 550)
-            symbol = random.choice(symbols)
-            size = random.randint(12, 24)
-            alpha = random.choice(['#16213e', '#0f0f23', '#1a1a2e'])
-            
-            element_id = self.hub_canvas.create_text(x, y, text=symbol,
-                                                   font=('Arial', size),
-                                                   fill=alpha, anchor='center')
-            
-            self.background_elements.append({
-                'id': element_id,
-                'x': x, 'y': y,
-                'dx': random.uniform(-0.5, 0.5),
-                'dy': random.uniform(-0.3, 0.3),
-                'phase': random.uniform(0, 6.28)
-            })
-        
-        # Create energy connecting lines
-        self.energy_lines = []
-        for i in range(8):
-            x1, y1 = random.randint(0, 1024), random.randint(0, 600)
-            x2, y2 = random.randint(0, 1024), random.randint(0, 600)
-            line_id = self.hub_canvas.create_line(x1, y1, x2, y2,
-                                                fill=self.colors['mystic'],
-                                                width=1, smooth=True)
-            self.energy_lines.append({
-                'id': line_id,
-                'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
-                'phase': random.uniform(0, 6.28)
-            })
-
-    def create_navigation_orbs(self):
-        """Create beautiful floating orb navigation instead of rectangular buttons"""
-        # Central mystical pattern
-        center_x, center_y = 512, 350
-        
-        # Navigation orbs data
-        orbs = [
-            ("🌍", "Elements", self.colors['earth'], 'elemental', -120, -80),
-            ("🎵", "Sounds", self.colors['ethereal'], 'soundboard', 120, -80),
-            ("🧙‍♂️", "Archetypes", self.colors['aether'], 'archetype', -120, 80),
-            ("⚙️", "Settings", self.colors['mystic'], 'settings', 120, 80)
+        # Sacred navigation buttons
+        buttons = [
+            ("🌍", "Elements", self.colors['earth'], 'elemental'),
+            ("🎵", "Sounds", self.colors['ethereal'], 'soundboard'),
+            ("🧙‍♂️", "Archetypes", self.colors['aether'], 'archetype'),
+            ("⚙️", "Settings", self.colors['mystic'], 'settings')
         ]
         
-        self.nav_orbs = []
+        # Create 2x2 grid
+        for i, (symbol, label, color, screen) in enumerate(buttons):
+            row, col = i // 2, i % 2
+            
+            btn = tk.Button(nav_frame,
+                           text=f"{symbol}\n{label}",
+                           font=self.fonts['symbol'],
+                           fg='white',
+                           bg=color,
+                           activebackground=self.adjust_color(color, 1.2),
+                           activeforeground='white',
+                           bd=0,
+                           width=10,
+                           height=4,
+                           command=lambda s=screen: self.safe_navigate(s))
+            btn.grid(row=row, column=col, padx=40, pady=30, sticky='nsew')
+            
+            # Configure grid weights
+            nav_frame.grid_rowconfigure(row, weight=1)
+            nav_frame.grid_columnconfigure(col, weight=1)
         
-        for symbol, label, color, screen, offset_x, offset_y in orbs:
-            orb_x = center_x + offset_x
-            orb_y = center_y + offset_y
-            
-            # Create orb glow (multiple layers for depth)
-            glow_radius = 75
-            for i in range(5, 0, -1):
-                glow_size = glow_radius + (i * 8)
-                glow_color = self.adjust_color(color, 0.3 + (i * 0.1))
-                glow_id = self.hub_canvas.create_oval(orb_x - glow_size//2, orb_y - glow_size//2,
-                                                    orb_x + glow_size//2, orb_y + glow_size//2,
-                                                    fill=glow_color, outline='', stipple='gray25')
-            
-            # Main orb
-            orb_id = self.hub_canvas.create_oval(orb_x - 50, orb_y - 50,
-                                               orb_x + 50, orb_y + 50,
-                                               fill=color, outline=self.colors['gold'], width=2)
-            
-            # Symbol
-            symbol_id = self.hub_canvas.create_text(orb_x, orb_y - 5, text=symbol,
-                                                  font=('Arial', 28, 'bold'),
-                                                  fill='white', anchor='center')
-            
-            # Label
-            label_id = self.hub_canvas.create_text(orb_x, orb_y + 80, text=label,
-                                                 font=self.fonts['subtitle'],
-                                                 fill=color, anchor='center')
-            
-            # Store orb data for animations and clicks
-            orb_data = {
-                'orb_id': orb_id, 'symbol_id': symbol_id, 'label_id': label_id,
-                'x': orb_x, 'y': orb_y, 'base_x': orb_x, 'base_y': orb_y,
-                'color': color, 'screen': screen, 'phase': random.uniform(0, 6.28),
-                'hover_scale': 1.0, 'pulse_phase': random.uniform(0, 6.28)
-            }
-            self.nav_orbs.append(orb_data)
-            
-            # Bind click events
-            self.hub_canvas.tag_bind(orb_id, '<Button-1>', 
-                                   lambda e, s=screen: self.orb_click_effect(s))
-            self.hub_canvas.tag_bind(symbol_id, '<Button-1>', 
-                                   lambda e, s=screen: self.orb_click_effect(s))
-        
-        # Central mystical core
-        core_radius = 40
-        self.hub_canvas.create_oval(center_x - core_radius, center_y - core_radius,
-                                  center_x + core_radius, center_y + core_radius,
-                                  fill=self.colors['void'], outline=self.colors['gold'], width=3)
-        
-        # Rotating mystical symbol in center
-        self.central_symbol = self.hub_canvas.create_text(center_x, center_y, text="✧",
-                                                        font=('Arial', 32, 'bold'),
-                                                        fill=self.colors['gold'], anchor='center')
-
-    def start_hub_animations(self):
-        """Start all the beautiful ambient animations"""
-        self.animate_background()
-        self.animate_orbs()
-        self.animate_central_core()
-
-    def animate_background(self):
-        """Animate floating background elements"""
-        try:
-            import math
-            
-            for element in self.background_elements:
-                # Update position with gentle floating motion
-                element['x'] += element['dx']
-                element['y'] += element['dy'] + math.sin(element['phase']) * 0.2
-                element['phase'] += 0.02
-                
-                # Wrap around screen edges
-                if element['x'] < 0: element['x'] = 1024
-                if element['x'] > 1024: element['x'] = 0
-                if element['y'] < 0: element['y'] = 600
-                if element['y'] > 600: element['y'] = 0
-                
-                # Update canvas position
-                self.hub_canvas.coords(element['id'], element['x'], element['y'])
-            
-            # Animate energy lines with gentle pulsing
-            for line in self.energy_lines:
-                line['phase'] += 0.03
-                alpha_factor = 0.5 + 0.3 * math.sin(line['phase'])
-                # Note: Tkinter doesn't support alpha on lines, so we simulate with color intensity
-            
-            # Continue animation
-            if hasattr(self, 'hub_canvas') and self.current_screen == 'hub':
-                self.root.after(50, self.animate_background)
-                
-        except Exception as e:
-            print(f"Background animation error: {e}")
-
-    def animate_orbs(self):
-        """Animate navigation orbs with floating and pulsing effects"""
-        try:
-            import math
-            
-            for orb in self.nav_orbs:
-                # Gentle floating motion
-                orb['phase'] += 0.02
-                float_y = orb['base_y'] + math.sin(orb['phase']) * 8
-                float_x = orb['base_x'] + math.cos(orb['phase'] * 0.7) * 3
-                
-                # Pulsing glow effect
-                orb['pulse_phase'] += 0.05
-                pulse_scale = 1.0 + math.sin(orb['pulse_phase']) * 0.1
-                
-                # Update orb position
-                self.hub_canvas.coords(orb['orb_id'], 
-                                     float_x - 50 * pulse_scale, float_y - 50 * pulse_scale,
-                                     float_x + 50 * pulse_scale, float_y + 50 * pulse_scale)
-                
-                # Update symbol position
-                self.hub_canvas.coords(orb['symbol_id'], float_x, float_y - 5)
-                
-                # Update label position
-                self.hub_canvas.coords(orb['label_id'], float_x, float_y + 80)
-            
-            # Continue animation
-            if hasattr(self, 'hub_canvas') and self.current_screen == 'hub':
-                self.root.after(30, self.animate_orbs)
-                
-        except Exception as e:
-            print(f"Orb animation error: {e}")
-
-    def animate_central_core(self):
-        """Animate the central mystical symbol with rotation"""
-        try:
-            import math
-            
-            # Rotate the central symbol
-            if hasattr(self, 'central_symbol'):
-                symbols = ['✧', '◊', '✦', '◇', '✧']
-                current_time = datetime.now().second
-                symbol_index = (current_time // 2) % len(symbols)
-                
-                self.hub_canvas.itemconfig(self.central_symbol, text=symbols[symbol_index])
-            
-            # Continue animation
-            if hasattr(self, 'hub_canvas') and self.current_screen == 'hub':
-                self.root.after(1000, self.animate_central_core)
-                
-        except Exception as e:
-            print(f"Central core animation error: {e}")
-
-    def orb_click_effect(self, screen_name):
-        """Create magical click effect and navigate"""
-        try:
-            # Create ripple effect at click
-            self.create_click_ripple()
-            
-            # Navigate after brief delay for effect
-            self.root.after(200, lambda: self.safe_navigate(screen_name))
-            
-        except Exception as e:
-            print(f"Orb click error: {e}")
-
-    def create_click_ripple(self):
-        """Create beautiful ripple effect on orb click"""
-        try:
-            center_x, center_y = 512, 350
-            
-            # Create expanding ripples
-            for i in range(3):
-                delay = i * 100
-                self.root.after(delay, lambda i=i: self.draw_ripple(center_x, center_y, i))
-                
-        except Exception as e:
-            print(f"Ripple effect error: {e}")
-
-    def draw_ripple(self, x, y, wave_num):
-        """Draw a single ripple wave"""
-        try:
-            initial_radius = 20 + (wave_num * 15)
-            max_radius = 150
-            
-            def expand_ripple(radius):
-                if radius > max_radius:
-                    return
-                    
-                # Draw ripple circle
-                ripple_id = self.hub_canvas.create_oval(x - radius, y - radius,
-                                                      x + radius, y + radius,
-                                                      outline=self.colors['gold'],
-                                                      width=2, fill='')
-                
-                # Remove ripple after short time and continue expansion
-                self.root.after(50, lambda: self.hub_canvas.delete(ripple_id))
-                self.root.after(20, lambda: expand_ripple(radius + 8))
-            
-            expand_ripple(initial_radius)
-            
-        except Exception as e:
-            print(f"Ripple draw error: {e}")
+        self.screens['hub'] = hub
 
     def create_elemental_screen(self):
         """🌱 Elemental Modes - Sacred forces (placeholder)"""
@@ -515,7 +251,7 @@ class CrumbUI:
         self.screens['elemental'] = elemental
 
     def create_soundboard_screen(self):
-        """🎵 Sacred Soundboard - Expression tools with real sounds"""
+        """🎵 Sacred Soundboard - Expression tools (placeholder)"""
         soundboard = tk.Frame(self.main_frame, bg=self.colors['deep'])
         
         # Header
@@ -525,20 +261,20 @@ class CrumbUI:
         content_frame = tk.Frame(soundboard, bg=self.colors['deep'])
         content_frame.pack(expand=True, fill='both', padx=40, pady=20)
         
-        # Sound buttons grid - 9 sounds ready for MP3 files
+        # Sound buttons grid
         sounds = [
-            ("💚", "Happy", self.colors['sage'], "happy"),
-            ("😔", "Sad", self.colors['mystic'], "sad"),
-            ("😰", "Stress", self.colors['fire'], "stress"),
-            ("🤗", "Comfort", self.colors['water'], "comfort"),
-            ("⚡", "Energy", self.colors['ethereal'], "energy"),
-            ("🌙", "Calm", self.colors['aether'], "calm"),
-            ("🍎", "Need", self.colors['earth'], "need"),
-            ("💭", "Think", self.colors['air'], "think"),
-            ("❤️", "Love", self.colors['gold'], "love")
+            ("💚", "Happy", self.colors['sage']),
+            ("😔", "Sad", self.colors['mystic']),
+            ("😰", "Stress", self.colors['fire']),
+            ("🤗", "Comfort", self.colors['water']),
+            ("⚡", "Energy", self.colors['ethereal']),
+            ("🌙", "Calm", self.colors['aether']),
+            ("🍎", "Need", self.colors['earth']),
+            ("💭", "Think", self.colors['air']),
+            ("❤️", "Love", self.colors['gold'])
         ]
         
-        for i, (emoji, label, color, sound_file) in enumerate(sounds):
+        for i, (emoji, label, color) in enumerate(sounds):
             row, col = i // 3, i % 3
             
             btn = tk.Button(content_frame,
@@ -550,7 +286,7 @@ class CrumbUI:
                            width=8,
                            height=3,
                            bd=0,
-                           command=lambda f=sound_file: self.play_sound(f))
+                           command=lambda l=label: self.play_sound_placeholder(l))
             btn.grid(row=row, column=col, padx=20, pady=15, sticky='nsew')
         
         # Configure grid
@@ -715,6 +451,14 @@ class CrumbUI:
         except Exception as e:
             print(f"Element activation error: {e}")
 
+    def play_sound_placeholder(self, sound_name):
+        """🎵 Placeholder sound playing"""
+        try:
+            print(f"♫ Playing {sound_name} sound ♫")
+            self.show_temporary_message(f"♫ {sound_name} ♫\nSound Played", self.colors['ethereal'])
+        except Exception as e:
+            print(f"Sound play error: {e}")
+
     def handle_setting(self, setting_name):
         """⚙️ Placeholder settings handler"""
         try:
@@ -826,6 +570,11 @@ class CrumbUI:
         try:
             print("✧ Crumb UI v0.1 - Sacred Interface Starting ✧")
             print("Triple-tap top-left corner to exit")
+            
+            # Set up global error handler
+            def handle_tk_error(error):
+                self.handle_critical_error("Tkinter", error)
+                return True
             
             # Start the main loop with error handling
             while True:
