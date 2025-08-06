@@ -11,6 +11,8 @@ import sys
 import traceback
 import math
 import random
+import pygame
+import os
 from datetime import datetime
 
 class CrumbUI:
@@ -47,6 +49,9 @@ class CrumbUI:
             # Setup fonts with error handling
             self.setup_fonts()
             
+            # Initialize audio
+            self.setup_audio()
+            
             # Create main container
             self.main_frame = tk.Frame(self.root, bg=self.colors['deep'])
             self.main_frame.pack(fill='both', expand=True)
@@ -57,6 +62,9 @@ class CrumbUI:
             
             # Show hub screen
             self.show_screen('hub')
+            
+            # Play startup music
+            self.play_startup_music()
             
             # Bind exit gesture and error handling
             self.exit_taps = 0
@@ -90,6 +98,31 @@ class CrumbUI:
                 'symbol': ('Arial', 20, 'bold'),
                 'large_symbol': ('Arial', 36, 'bold')
             }
+
+    def setup_audio(self):
+        """Initialize audio system"""
+        try:
+            pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+            self.audio_enabled = True
+            print("✧ Audio system initialized ✧")
+        except Exception as e:
+            print(f"Audio initialization error: {e}")
+            self.audio_enabled = False
+
+    def play_startup_music(self):
+        """Play mystical startup music"""
+        if not self.audio_enabled:
+            return
+        try:
+            music_file = "assets/sounds/startup_mystical.wav"
+            if os.path.exists(music_file):
+                pygame.mixer.music.load(music_file)
+                pygame.mixer.music.set_volume(0.3)
+                pygame.mixer.music.play(-1)  # Loop forever
+            else:
+                print(f"Startup music not found: {music_file}")
+        except Exception as e:
+            print(f"Music play error: {e}")
 
     def create_all_screens(self):
         """Create all interface screens with error handling"""
@@ -188,6 +221,31 @@ class CrumbUI:
                 'phase': random.uniform(0, 6.28)
             })
 
+    def create_crumb_character(self):
+        """Draw a simple 8-bit Crumb character that jumps"""
+        char_x, char_y = 80, 450
+        
+        # Body (simple rectangle)
+        self.crumb_body = self.hub_canvas.create_rectangle(
+            char_x-8, char_y-16, char_x+8, char_y+8, 
+            fill=self.colors['gold'], outline=self.colors['ethereal'], width=2)
+        
+        # Head (circle)
+        self.crumb_head = self.hub_canvas.create_oval(
+            char_x-6, char_y-24, char_x+6, char_y-12,
+            fill=self.colors['sage'], outline=self.colors['gold'], width=1)
+        
+        # Eyes (tiny dots)
+        self.crumb_eye1 = self.hub_canvas.create_oval(char_x-3, char_y-20, char_x-1, char_y-18, fill='white')
+        self.crumb_eye2 = self.hub_canvas.create_oval(char_x+1, char_y-20, char_x+3, char_y-18, fill='white')
+        
+        # Store character data
+        self.crumb_char = {
+            'x': char_x, 'base_y': char_y, 'y': char_y,
+            'jump_phase': 0,
+            'parts': [self.crumb_body, self.crumb_head, self.crumb_eye1, self.crumb_eye2]
+        }
+
     def create_navigation_orbs(self):
         """Create beautiful floating orb navigation instead of rectangular buttons"""
         # Central mystical pattern
@@ -256,12 +314,16 @@ class CrumbUI:
         self.central_symbol = self.hub_canvas.create_text(center_x, center_y, text="✧",
                                                         font=('Arial', 32, 'bold'),
                                                         fill=self.colors['gold'], anchor='center')
+        
+        # Create Crumb character
+        self.create_crumb_character()
 
     def start_hub_animations(self):
         """Start all the beautiful ambient animations"""
         self.animate_background()
         self.animate_orbs()
         self.animate_central_core()
+        self.animate_crumb_character()
 
     def animate_background(self):
         """Animate floating background elements"""
@@ -348,6 +410,34 @@ class CrumbUI:
                 
         except Exception as e:
             print(f"Central core animation error: {e}")
+
+    def animate_crumb_character(self):
+        """Make Crumb character jump up and down"""
+        try:
+            import math
+            
+            # Simple jumping motion
+            self.crumb_char['jump_phase'] += 0.08
+            jump_offset = abs(math.sin(self.crumb_char['jump_phase'])) * 15
+            new_y = self.crumb_char['base_y'] - jump_offset
+            
+            # Move all character parts
+            for part in self.crumb_char['parts']:
+                current_coords = self.hub_canvas.coords(part)
+                if len(current_coords) == 4:  # Rectangle or oval
+                    y_diff = new_y - self.crumb_char['y']
+                    self.hub_canvas.coords(part, 
+                        current_coords[0], current_coords[1] + y_diff,
+                        current_coords[2], current_coords[3] + y_diff)
+            
+            self.crumb_char['y'] = new_y
+            
+            # Continue animation
+            if hasattr(self, 'hub_canvas') and self.current_screen == 'hub':
+                self.root.after(60, self.animate_crumb_character)
+                
+        except Exception as e:
+            print(f"Character animation error: {e}")
 
     def orb_click_effect(self, screen_name):
         """Create magical click effect and navigate"""
