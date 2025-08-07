@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-🌀 Crumb UI - Minimal Sacred Interface v0.1
-A clean, reliable menu system for continuous testing
-Designed for RasPad touchscreen with sacred intention
+🌀 Crumb UI - Minimal Sacred Interface v0.2
+Clean, magical, reliable interface for RasPad touchscreen
+Designed with sacred intention and mystical beauty
 """
 
 import tkinter as tk
@@ -16,16 +16,16 @@ from datetime import datetime
 class CrumbUI:
     def __init__(self):
         try:
-            # Initialize the sacred vessel (main window)
+            # Initialize the sacred vessel
             self.root = tk.Tk()
             self.root.title("✧ Crumb ✧")
             self.root.configure(bg='#1a1a2e')
             
-            # Configure for touchscreen (RasPad dimensions)
+            # Configure for RasPad touchscreen
             self.root.geometry("1024x600")
             self.root.attributes('-fullscreen', True)
             
-            # Sacred color palette - simplified
+            # Sacred color palette
             self.colors = {
                 'void': '#0f0f23',
                 'deep': '#1a1a2e', 
@@ -40,11 +40,12 @@ class CrumbUI:
                 'aether': '#c44569'
             }
             
-            # Initialize app state
+            # Initialize state
             self.current_screen = "hub"
-            self.last_activity = datetime.now()
+            self.exit_taps = 0
+            self.animation_running = False
             
-            # Setup fonts and audio
+            # Setup systems
             self.setup_fonts()
             self.setup_audio()
             
@@ -52,129 +53,151 @@ class CrumbUI:
             self.main_frame = tk.Frame(self.root, bg=self.colors['deep'])
             self.main_frame.pack(fill='both', expand=True)
             
-            # Initialize screens
+            # Create screens
             self.screens = {}
-            self.create_all_screens()
+            self.create_hub_screen()
+            self.create_placeholder_screens()
             
-            # Show hub screen
+            # Start hub
             self.show_screen('hub')
             
             # Play startup music
             self.play_startup_music()
             
-            # Bind exit gesture and error handling
-            self.exit_taps = 0
+            # Setup interactions
             self.root.bind('<Button-1>', self.handle_click)
             
-            # Set up continuous operation
-            self.setup_continuous_operation()
+            # Start animations
+            self.start_animations()
             
-            print("✧ Crumb UI initialized successfully ✧")
+            print("✧ Crumb UI v0.2 initialized successfully ✧")
             
         except Exception as e:
-            self.handle_critical_error("Initialization", e)
+            self.handle_error("Initialization", e)
 
     def setup_fonts(self):
-        """Initialize sacred typography with fallbacks"""
+        """Initialize sacred typography"""
         try:
             self.fonts = {
-                'title': font.Font(family="Arial", size=24, weight="bold"),
-                'subtitle': font.Font(family="Arial", size=16),
+                'title': font.Font(family="Arial", size=28, weight="bold"),
+                'subtitle': font.Font(family="Arial", size=14),
                 'body': font.Font(family="Arial", size=12),
-                'symbol': font.Font(family="Arial", size=20, weight="bold"),
-                'large_symbol': font.Font(family="Arial", size=36, weight="bold")
+                'button': font.Font(family="Arial", size=16, weight="bold"),
+                'large_symbol': font.Font(family="Arial", size=32, weight="bold"),
+                'companion': font.Font(family="Arial", size=24)
             }
         except Exception as e:
             print(f"Font setup warning: {e}")
-            # Fallback to default fonts
+            # Fallback fonts
             self.fonts = {
-                'title': ('Arial', 24, 'bold'),
-                'subtitle': ('Arial', 16),
+                'title': ('Arial', 28, 'bold'),
+                'subtitle': ('Arial', 14),
                 'body': ('Arial', 12),
-                'symbol': ('Arial', 20, 'bold'),
-                'large_symbol': ('Arial', 36, 'bold')
+                'button': ('Arial', 16, 'bold'),
+                'large_symbol': ('Arial', 32, 'bold'),
+                'companion': ('Arial', 24)
             }
 
     def setup_audio(self):
         """Initialize audio system"""
         try:
-            # Force pygame to use USB speaker (card 2)
+            # Try USB speaker first
             os.environ['SDL_AUDIODRIVER'] = 'alsa'
             os.environ['ALSA_PCM_DEVICE'] = '2'
             
             pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=1024)
             pygame.mixer.init()
             self.audio_enabled = True
-            print("✧ Audio system initialized with USB speaker ✧")
+            print("✧ Audio system initialized ✧")
         except Exception as e:
             print(f"Audio initialization error: {e}")
-            # Try without USB forcing
             try:
                 pygame.mixer.init()
                 self.audio_enabled = True
                 print("✧ Audio system initialized with default device ✧")
             except:
                 self.audio_enabled = False
+                print("✧ Audio disabled ✧")
 
     def play_startup_music(self):
-        """Play startup music"""
+        """Play continuous background music"""
         if not self.audio_enabled:
             return
         try:
             startup_file = "/home/pi/Downloads/startup.mp3"
             if os.path.exists(startup_file):
                 pygame.mixer.music.load(startup_file)
-                pygame.mixer.music.set_volume(0.6)
+                pygame.mixer.music.set_volume(0.4)
                 pygame.mixer.music.play(-1)  # Loop forever
                 print("✧ Startup music playing ✧")
-            else:
-                print(f"Startup music not found: {startup_file}")
         except Exception as e:
-            print(f"Music play error: {e}")
-
-    def create_all_screens(self):
-        """Create all interface screens with error handling"""
-        screen_creators = [
-            ('hub', self.create_hub_screen),
-            ('elemental', self.create_elemental_screen),
-            ('soundboard', self.create_soundboard_screen),
-            ('archetype', self.create_archetype_screen),
-            ('settings', self.create_settings_screen)
-        ]
-        
-        for screen_name, creator_func in screen_creators:
-            try:
-                creator_func()
-                print(f"✧ Created {screen_name} screen ✧")
-            except Exception as e:
-                print(f"Error creating {screen_name} screen: {e}")
-                self.create_error_screen(screen_name, e)
+            print(f"Music error: {e}")
 
     def create_hub_screen(self):
-        """🧿 The Sacred Hub - Gateway to all realms"""
+        """🏠 The Sacred Hub - Enhanced with magic"""
         hub = tk.Frame(self.main_frame, bg=self.colors['deep'])
         
-        # Title section
-        title_frame = tk.Frame(hub, bg=self.colors['deep'])
-        title_frame.pack(pady=40)
+        # Main content container
+        content_frame = tk.Frame(hub, bg=self.colors['deep'])
+        content_frame.pack(expand=True)
         
-        title = tk.Label(title_frame, text="✧ CRUMB ✧", 
-                        font=self.fonts['large_symbol'],
-                        fg=self.colors['gold'],
-                        bg=self.colors['deep'])
-        title.pack()
+        # Title section with enhanced styling
+        title_frame = tk.Frame(content_frame, bg=self.colors['deep'])
+        title_frame.pack(pady=(50, 30))
         
-        subtitle = tk.Label(title_frame, text="Sacred Companion • Testing Interface", 
+        # Main title with glow effect
+        main_title = tk.Label(title_frame, 
+                             text="✧ CRUMB ✧", 
+                             font=self.fonts['title'],
+                             fg=self.colors['gold'],
+                             bg=self.colors['deep'])
+        main_title.pack()
+        
+        # Glowing subtitle
+        subtitle = tk.Label(title_frame, 
+                           text="A Friendly AI for Real-Life Support", 
                            font=self.fonts['subtitle'],
                            fg=self.colors['sage'],
                            bg=self.colors['deep'])
-        subtitle.pack(pady=10)
+        subtitle.pack(pady=(10, 0))
         
-        # Navigation grid
-        nav_frame = tk.Frame(hub, bg=self.colors['deep'])
-        nav_frame.pack(expand=True)
+        # Sacred tagline
+        tagline = tk.Label(title_frame, 
+                          text="✦ Sacred Companion • Testing Interface ✦", 
+                          font=self.fonts['body'],
+                          fg=self.colors['aether'],
+                          bg=self.colors['deep'])
+        tagline.pack(pady=(5, 0))
         
-        # Sacred navigation buttons
+        # Companion and navigation area
+        nav_container = tk.Frame(content_frame, bg=self.colors['deep'])
+        nav_container.pack(expand=True)
+        
+        # Left side - Floating companion
+        companion_frame = tk.Frame(nav_container, bg=self.colors['deep'])
+        companion_frame.pack(side='left', fill='y', padx=(80, 40))
+        
+        # Animated companion - will be animated later
+        self.companion = tk.Label(companion_frame, 
+                                 text="🌟", 
+                                 font=self.fonts['companion'],
+                                 fg=self.colors['gold'],
+                                 bg=self.colors['deep'])
+        self.companion.pack(expand=True)
+        
+        companion_msg = tk.Label(companion_frame, 
+                                text="Hello,\nfriend!", 
+                                font=self.fonts['body'],
+                                fg=self.colors['water'],
+                                bg=self.colors['deep'],
+                                justify='center')
+        companion_msg.pack()
+        
+        # Right side - Navigation buttons
+        nav_frame = tk.Frame(nav_container, bg=self.colors['deep'])
+        nav_frame.pack(side='right', padx=(40, 80))
+        
+        # Sacred navigation buttons in 2x2 grid
         buttons = [
             ("🌍", "Elements", self.colors['earth'], 'elemental'),
             ("🎵", "Sounds", self.colors['ethereal'], 'soundboard'),
@@ -182,392 +205,238 @@ class CrumbUI:
             ("⚙️", "Settings", self.colors['mystic'], 'settings')
         ]
         
-        # Create 2x2 grid
         for i, (symbol, label, color, screen) in enumerate(buttons):
             row, col = i // 2, i % 2
             
             btn = tk.Button(nav_frame,
                            text=f"{symbol}\n{label}",
-                           font=self.fonts['symbol'],
+                           font=self.fonts['button'],
                            fg='white',
                            bg=color,
-                           activebackground=self.adjust_color(color, 1.2),
+                           activebackground=self.lighten_color(color),
                            activeforeground='white',
                            bd=0,
-                           width=10,
-                           height=4,
+                           relief='flat',
+                           width=9,
+                           height=3,
                            command=lambda s=screen: self.safe_navigate(s))
-            btn.grid(row=row, column=col, padx=40, pady=30, sticky='nsew')
-            
-            # Configure grid weights
-            nav_frame.grid_rowconfigure(row, weight=1)
-            nav_frame.grid_columnconfigure(col, weight=1)
+            btn.grid(row=row, column=col, padx=15, pady=15, sticky='nsew')
+        
+        # Configure grid weights for responsive layout
+        nav_frame.grid_rowconfigure(0, weight=1)
+        nav_frame.grid_rowconfigure(1, weight=1)
+        nav_frame.grid_columnconfigure(0, weight=1)
+        nav_frame.grid_columnconfigure(1, weight=1)
+        
+        # Sparkle background elements
+        self.create_sparkles(hub)
         
         self.screens['hub'] = hub
 
-    def create_elemental_screen(self):
-        """🌱 Elemental Modes - Sacred forces (placeholder)"""
-        elemental = tk.Frame(self.main_frame, bg=self.colors['void'])
+    def create_sparkles(self, parent):
+        """Add subtle sparkle background"""
+        try:
+            sparkle_positions = [(150, 120), (850, 180), (200, 450), (800, 380), (500, 100)]
+            self.sparkles = []
+            
+            for x, y in sparkle_positions:
+                sparkle = tk.Label(parent, 
+                                  text="✦", 
+                                  font=('Arial', 8),
+                                  fg=self.colors['sage'],
+                                  bg=self.colors['deep'])
+                sparkle.place(x=x, y=y)
+                self.sparkles.append(sparkle)
+        except Exception as e:
+            print(f"Sparkle creation error: {e}")
+
+    def create_placeholder_screens(self):
+        """Create simplified placeholder screens"""
+        screens_config = [
+            ('elemental', "✧ Elemental Modes ✧", "🌱", "Sacred elemental forces await..."),
+            ('soundboard', "✧ Sacred Sounds ✧", "🎵", "Expression tools in development..."),
+            ('archetype', "✧ Archetype Portal ✧", "🧙‍♂️", "Mystical companions awakening..."),
+            ('settings', "✧ Sacred Settings ✧", "⚙️", "Configuration options coming soon...")
+        ]
+        
+        for screen_name, title, symbol, message in screens_config:
+            try:
+                self.create_placeholder_screen(screen_name, title, symbol, message)
+            except Exception as e:
+                print(f"Error creating {screen_name}: {e}")
+
+    def create_placeholder_screen(self, name, title, symbol, message):
+        """Create a clean placeholder screen"""
+        screen = tk.Frame(self.main_frame, bg=self.colors['void'])
         
         # Header with back button
-        self.create_header(elemental, "✧ Elemental Modes ✧", self.colors['gold'])
-        
-        # Content area
-        content_frame = tk.Frame(elemental, bg=self.colors['void'])
-        content_frame.pack(expand=True, fill='both', padx=40, pady=20)
-        
-        # Elements grid
-        elements = [
-            ("🌍", "Earth", self.colors['earth']),
-            ("🔥", "Fire", self.colors['fire']),
-            ("🌊", "Water", self.colors['water']),
-            ("💨", "Air", self.colors['air']),
-            ("✨", "Aether", self.colors['aether'])
-        ]
-        
-        for i, (symbol, name, color) in enumerate(elements):
-            row, col = i // 3, i % 3
-            
-            element_frame = tk.Frame(content_frame, bg=self.colors['void'])
-            element_frame.grid(row=row, column=col, padx=30, pady=30, sticky='nsew')
-            
-            # Element button
-            btn = tk.Button(element_frame,
-                           text=symbol,
-                           font=self.fonts['large_symbol'],
-                           fg='white',
-                           bg=color,
-                           activebackground=self.adjust_color(color, 1.2),
-                           width=4,
-                           height=2,
-                           bd=0,
-                           command=lambda n=name: self.activate_element(n))
-            btn.pack()
-            
-            # Element name
-            name_label = tk.Label(element_frame, 
-                                 text=name,
-                                 font=self.fonts['subtitle'],
-                                 fg=color,
-                                 bg=self.colors['void'])
-            name_label.pack(pady=10)
-        
-        # Configure grid
-        for i in range(2):
-            content_frame.grid_rowconfigure(i, weight=1)
-        for i in range(3):
-            content_frame.grid_columnconfigure(i, weight=1)
-        
-        self.screens['elemental'] = elemental
-
-    def create_soundboard_screen(self):
-        """🎵 Sacred Soundboard - Expression tools (placeholder)"""
-        soundboard = tk.Frame(self.main_frame, bg=self.colors['deep'])
-        
-        # Header
-        self.create_header(soundboard, "✧ Sacred Sounds ✧", self.colors['ethereal'])
-        
-        # Content area
-        content_frame = tk.Frame(soundboard, bg=self.colors['deep'])
-        content_frame.pack(expand=True, fill='both', padx=40, pady=20)
-        
-        # Sound buttons grid
-        sounds = [
-            ("💚", "Happy", self.colors['sage']),
-            ("😔", "Sad", self.colors['mystic']),
-            ("😰", "Stress", self.colors['fire']),
-            ("🤗", "Comfort", self.colors['water']),
-            ("⚡", "Energy", self.colors['ethereal']),
-            ("🌙", "Calm", self.colors['aether']),
-            ("🍎", "Need", self.colors['earth']),
-            ("💭", "Think", self.colors['air']),
-            ("❤️", "Love", self.colors['gold'])
-        ]
-        
-        for i, (emoji, label, color) in enumerate(sounds):
-            row, col = i // 3, i % 3
-            
-            btn = tk.Button(content_frame,
-                           text=f"{emoji}\n{label}",
-                           font=self.fonts['symbol'],
-                           fg='white',
-                           bg=color,
-                           activebackground=self.adjust_color(color, 1.2),
-                           width=8,
-                           height=3,
-                           bd=0,
-                           command=lambda l=label: self.play_sound_placeholder(l))
-            btn.grid(row=row, column=col, padx=20, pady=15, sticky='nsew')
-        
-        # Configure grid
-        for i in range(3):
-            content_frame.grid_rowconfigure(i, weight=1)
-            content_frame.grid_columnconfigure(i, weight=1)
-        
-        self.screens['soundboard'] = soundboard
-
-    def create_archetype_screen(self):
-        """🧙‍♂️ Archetype Portal - Future companions"""
-        archetype = tk.Frame(self.main_frame, bg=self.colors['void'])
-        
-        # Header
-        self.create_header(archetype, "✧ Archetype Portal ✧", self.colors['aether'])
-        
-        # Content area
-        content_frame = tk.Frame(archetype, bg=self.colors['void'])
-        content_frame.pack(expand=True)
-        
-        # Future content placeholder
-        symbol = tk.Label(content_frame, 
-                         text="🔮",
-                         font=self.fonts['large_symbol'],
-                         fg=self.colors['aether'],
-                         bg=self.colors['void'])
-        symbol.pack(pady=60)
-        
-        message = tk.Label(content_frame, 
-                          text="Sacred Archetypes Awakening...\n\n• The Guide\n• The Trickster\n• The Watcher\n• The Healer\n\nComing Soon",
-                          font=self.fonts['subtitle'],
-                          fg=self.colors['sage'],
-                          bg=self.colors['void'],
-                          justify='center')
-        message.pack()
-        
-        self.screens['archetype'] = archetype
-
-    def create_settings_screen(self):
-        """⚙️ Sacred Settings - Configuration"""
-        settings = tk.Frame(self.main_frame, bg=self.colors['mystic'])
-        
-        # Header
-        self.create_header(settings, "✧ Sacred Settings ✧", self.colors['gold'])
-        
-        # Content area
-        content_frame = tk.Frame(settings, bg=self.colors['mystic'])
-        content_frame.pack(expand=True, pady=40)
-        
-        # Settings options
-        settings_items = [
-            ("🔊", "Volume", "Adjust sound levels"),
-            ("✨", "Brightness", "Screen brightness"),
-            ("🎨", "Theme", "Color preferences"),
-            ("🔄", "Reset", "Restore defaults"),
-            ("ℹ️", "About", "System information"),
-            ("🚪", "Exit", "Close application")
-        ]
-        
-        for i, (symbol, title, desc) in enumerate(settings_items):
-            row, col = i // 2, i % 2
-            
-            setting_frame = tk.Frame(content_frame, bg=self.colors['mystic'])
-            setting_frame.grid(row=row, column=col, padx=40, pady=20, sticky='ew')
-            
-            btn = tk.Button(setting_frame,
-                           text=f"{symbol} {title}",
-                           font=self.fonts['subtitle'],
-                           fg='white',
-                           bg=self.colors['deep'],
-                           activebackground=self.adjust_color(self.colors['deep'], 1.3),
-                           bd=0,
-                           width=15,
-                           height=2,
-                           command=lambda t=title: self.handle_setting(t))
-            btn.pack()
-            
-            desc_label = tk.Label(setting_frame,
-                                 text=desc,
-                                 font=self.fonts['body'],
-                                 fg=self.colors['sage'],
-                                 bg=self.colors['mystic'])
-            desc_label.pack(pady=5)
-        
-        # Configure grid
-        for i in range(3):
-            content_frame.grid_rowconfigure(i, weight=1)
-        for i in range(2):
-            content_frame.grid_columnconfigure(i, weight=1)
-        
-        self.screens['settings'] = settings
-
-    def create_header(self, parent, title_text, title_color):
-        """Create a standard header with back button"""
-        header = tk.Frame(parent, bg=parent['bg'])
-        header.pack(fill='x', pady=20)
+        header = tk.Frame(screen, bg=self.colors['void'])
+        header.pack(fill='x', pady=30)
         
         # Back button
         back_btn = tk.Button(header, 
-                            text="← Hub",
+                            text="← Back to Hub",
                             font=self.fonts['body'],
                             fg=self.colors['sage'],
                             bg=self.colors['deep'],
-                            activebackground=self.adjust_color(self.colors['deep'], 1.2),
+                            activebackground=self.lighten_color(self.colors['deep']),
                             bd=0,
                             padx=20,
                             pady=10,
                             command=lambda: self.safe_navigate('hub'))
-        back_btn.pack(side='left', padx=20)
+        back_btn.pack(side='left', padx=30)
         
         # Title
-        title = tk.Label(header, 
-                        text=title_text,
-                        font=self.fonts['title'],
-                        fg=title_color,
-                        bg=parent['bg'])
-        title.pack()
+        title_label = tk.Label(header, 
+                              text=title,
+                              font=self.fonts['title'],
+                              fg=self.colors['gold'],
+                              bg=self.colors['void'])
+        title_label.pack()
+        
+        # Content area
+        content_frame = tk.Frame(screen, bg=self.colors['void'])
+        content_frame.pack(expand=True)
+        
+        # Symbol
+        symbol_label = tk.Label(content_frame, 
+                               text=symbol,
+                               font=self.fonts['large_symbol'],
+                               fg=self.colors['aether'],
+                               bg=self.colors['void'])
+        symbol_label.pack(pady=80)
+        
+        # Message
+        message_label = tk.Label(content_frame, 
+                                text=message + "\n\nThis feature is under development.",
+                                font=self.fonts['subtitle'],
+                                fg=self.colors['sage'],
+                                bg=self.colors['void'],
+                                justify='center')
+        message_label.pack()
+        
+        self.screens[name] = screen
 
-    def create_error_screen(self, screen_name, error):
-        """Create a fallback error screen"""
-        error_screen = tk.Frame(self.main_frame, bg=self.colors['deep'])
-        
-        error_label = tk.Label(error_screen,
-                              text=f"⚠️ Error in {screen_name}\n\n{str(error)[:100]}...\n\nReturning to Hub",
-                              font=self.fonts['subtitle'],
-                              fg=self.colors['ethereal'],
-                              bg=self.colors['deep'],
-                              justify='center')
-        error_label.pack(expand=True)
-        
-        # Auto-return to hub after 3 seconds
-        error_screen.after(3000, lambda: self.safe_navigate('hub'))
-        
-        self.screens[screen_name] = error_screen
+    def start_animations(self):
+        """Start lightweight animations"""
+        if self.animation_running:
+            return
+        self.animation_running = True
+        self.animate_companion()
+        self.animate_sparkles()
+
+    def animate_companion(self):
+        """Animate the floating companion"""
+        try:
+            if hasattr(self, 'companion') and self.current_screen == 'hub':
+                # Cycle through companion states
+                companions = ["🌟", "✨", "💫", "⭐"]
+                current_index = getattr(self, 'companion_index', 0)
+                
+                self.companion.config(text=companions[current_index])
+                self.companion_index = (current_index + 1) % len(companions)
+            
+            # Continue animation
+            self.root.after(1200, self.animate_companion)
+            
+        except Exception as e:
+            print(f"Companion animation error: {e}")
+            self.root.after(2000, self.animate_companion)
+
+    def animate_sparkles(self):
+        """Animate background sparkles"""
+        try:
+            if hasattr(self, 'sparkles') and self.current_screen == 'hub':
+                # Cycle sparkle opacity/visibility
+                sparkle_states = ["✦", "✧", "✦", " "]
+                current_state = getattr(self, 'sparkle_state', 0)
+                
+                for i, sparkle in enumerate(self.sparkles):
+                    # Stagger sparkle animation
+                    state_index = (current_state + i) % len(sparkle_states)
+                    sparkle.config(text=sparkle_states[state_index])
+                
+                self.sparkle_state = (current_state + 1) % len(sparkle_states)
+            
+            # Continue animation
+            self.root.after(1500, self.animate_sparkles)
+            
+        except Exception as e:
+            print(f"Sparkle animation error: {e}")
+            self.root.after(3000, self.animate_sparkles)
 
     def safe_navigate(self, screen_name):
-        """Navigate with error handling"""
+        """Navigate with full error protection"""
         try:
-            self.show_screen(screen_name)
-            self.last_activity = datetime.now()
-            print(f"✧ Navigated to {screen_name} ✧")
+            if screen_name in self.screens:
+                self.show_screen(screen_name)
+                print(f"✧ Navigated to {screen_name} ✧")
+            else:
+                print(f"Screen {screen_name} not found, returning to hub")
+                self.show_screen('hub')
         except Exception as e:
-            print(f"Navigation error to {screen_name}: {e}")
+            print(f"Navigation error: {e}")
             self.show_screen('hub')
 
     def show_screen(self, screen_name):
-        """Navigate between sacred realms"""
-        # Hide all screens
-        for screen in self.screens.values():
-            screen.pack_forget()
-        
-        # Show requested screen or default to hub
-        target_screen = screen_name if screen_name in self.screens else 'hub'
-        self.screens[target_screen].pack(fill='both', expand=True)
-        self.current_screen = target_screen
-
-    def activate_element(self, element_name):
-        """🌱 Placeholder element activation"""
+        """Switch between screens safely"""
         try:
-            print(f"✧ Activating {element_name} mode ✧")
-            self.show_temporary_message(f"✨ {element_name} ✨\nActivated", self.colors['gold'])
-        except Exception as e:
-            print(f"Element activation error: {e}")
-
-    def play_sound_placeholder(self, sound_name):
-        """🎵 Placeholder sound playing"""
-        try:
-            print(f"♫ Playing {sound_name} sound ♫")
-            self.show_temporary_message(f"♫ {sound_name} ♫\nSound Played", self.colors['ethereal'])
-        except Exception as e:
-            print(f"Sound play error: {e}")
-
-    def handle_setting(self, setting_name):
-        """⚙️ Placeholder settings handler"""
-        try:
-            if setting_name == "Exit":
-                self.graceful_exit()
+            # Hide all screens
+            for screen in self.screens.values():
+                screen.pack_forget()
+            
+            # Show target screen
+            if screen_name in self.screens:
+                self.screens[screen_name].pack(fill='both', expand=True)
+                self.current_screen = screen_name
             else:
-                print(f"⚙️ {setting_name} setting accessed ⚙️")
-                self.show_temporary_message(f"⚙️ {setting_name} ⚙️\nComing Soon", self.colors['sage'])
+                # Fallback to hub
+                self.screens['hub'].pack(fill='both', expand=True)
+                self.current_screen = 'hub'
+                
         except Exception as e:
-            print(f"Settings error: {e}")
-
-    def show_temporary_message(self, message, color):
-        """Show a temporary overlay message"""
-        try:
-            overlay = tk.Toplevel(self.root)
-            overlay.configure(bg=self.colors['void'])
-            overlay.attributes('-fullscreen', True)
-            overlay.attributes('-alpha', 0.9)
-            
-            message_label = tk.Label(overlay,
-                                   text=message,
-                                   font=self.fonts['title'],
-                                   fg=color,
-                                   bg=self.colors['void'])
-            message_label.pack(expand=True)
-            
-            # Auto-close after 1.5 seconds
-            overlay.after(1500, overlay.destroy)
-            
-        except Exception as e:
-            print(f"Overlay error: {e}")
+            print(f"Screen display error: {e}")
 
     def handle_click(self, event):
         """Handle all click events including exit gesture"""
         try:
-            self.last_activity = datetime.now()
-            
             # Exit gesture: triple-tap top-left corner
             if event.x < 100 and event.y < 100:
                 self.exit_taps += 1
+                print(f"Exit tap {self.exit_taps}/3")
                 if self.exit_taps >= 3:
                     self.graceful_exit()
-                # Reset counter after 2 seconds
-                self.root.after(2000, self.reset_exit_counter)
+                # Reset counter after 3 seconds
+                self.root.after(3000, self.reset_exit_counter)
                 
         except Exception as e:
             print(f"Click handler error: {e}")
 
     def reset_exit_counter(self):
-        """Reset the exit gesture counter"""
+        """Reset exit gesture counter"""
         self.exit_taps = 0
 
-    def adjust_color(self, hex_color, factor):
-        """Adjust color brightness for hover effects"""
+    def lighten_color(self, hex_color):
+        """Create lighter version of color for hover effects"""
         try:
             hex_color = hex_color.lstrip('#')
             rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-            adjusted_rgb = tuple(min(255, max(0, int(c * factor))) for c in rgb)
-            return f"#{adjusted_rgb[0]:02x}{adjusted_rgb[1]:02x}{adjusted_rgb[2]:02x}"
+            lighter_rgb = tuple(min(255, int(c * 1.3)) for c in rgb)
+            return f"#{lighter_rgb[0]:02x}{lighter_rgb[1]:02x}{lighter_rgb[2]:02x}"
         except:
-            return hex_color  # Return original on error
+            return hex_color
 
-    def setup_continuous_operation(self):
-        """Set up continuous operation with error recovery"""
-        def heartbeat():
-            try:
-                # Update UI every second
-                self.root.after(1000, heartbeat)
-            except Exception as e:
-                print(f"Heartbeat error: {e}")
-                # Try to recover
-                self.root.after(5000, heartbeat)
-        
-        # Start heartbeat
-        heartbeat()
-
-    def handle_critical_error(self, context, error):
-        """Handle critical errors that could crash the app"""
-        error_msg = f"Critical error in {context}: {str(error)}"
+    def handle_error(self, context, error):
+        """Universal error handler"""
+        error_msg = f"Error in {context}: {str(error)}"
         print(f"🚨 {error_msg}")
         print(f"Traceback: {traceback.format_exc()}")
-        
-        try:
-            # Try to show error on screen
-            if hasattr(self, 'root') and self.root.winfo_exists():
-                error_label = tk.Label(self.root,
-                                     text=f"🚨 System Error\n\n{error_msg[:200]}...\n\nContinuing...",
-                                     font=('Arial', 16),
-                                     fg='#ff6b35',
-                                     bg='#1a1a2e')
-                error_label.pack(expand=True)
-                self.root.after(5000, error_label.destroy)
-        except:
-            pass  # If we can't show the error, just continue
 
     def graceful_exit(self):
-        """🚪 Exit the sacred space gracefully"""
+        """Exit the application gracefully"""
         try:
             print("✧ Sacred journey ending gracefully ✧")
+            self.animation_running = False
             if self.audio_enabled:
                 pygame.mixer.quit()
             self.root.quit()
@@ -576,73 +445,41 @@ class CrumbUI:
             sys.exit(0)
 
     def run(self):
-        """🌀 Begin the sacred journey with robust error handling"""
+        """Start the sacred interface"""
         try:
-            print("✧ Crumb UI v0.1 - Sacred Interface Starting ✧")
+            print("✧ Crumb UI v0.2 - Minimal Sacred Interface Starting ✧")
             print("Triple-tap top-left corner to exit")
             
-            # Set up global error handler
-            def handle_tk_error(error):
-                self.handle_critical_error("Tkinter", error)
-                return True
-            
-            # Start the main loop with error handling
+            # Start main loop with error recovery
             while True:
                 try:
                     self.root.mainloop()
                     break  # Normal exit
                 except Exception as e:
-                    self.handle_critical_error("Main Loop", e)
+                    self.handle_error("Main Loop", e)
                     # Try to recover
-                    if hasattr(self, 'root'):
-                        try:
-                            self.root.update()
-                        except:
-                            break
-                    else:
+                    try:
+                        self.root.update()
+                    except:
                         break
                         
         except KeyboardInterrupt:
-            print("\n✧ Sacred journey interrupted by user ✧")
+            print("\n✧ Sacred journey interrupted ✧")
         except Exception as e:
-            self.handle_critical_error("Application", e)
+            self.handle_error("Application", e)
         finally:
             print("✧ Crumb UI session ended ✧")
 
 
 def main():
-    """Initialize the sacred vessel with maximum reliability"""
+    """Initialize and run Crumb with maximum reliability"""
     try:
         app = CrumbUI() 
         app.run()
     except Exception as e:
         print(f"Fatal error: {e}")
         print(f"Traceback: {traceback.format_exc()}")
-        # Keep the process alive even on fatal errors
-        print("✧ Attempting emergency recovery ✧")
-        try:
-            # Basic emergency interface
-            root = tk.Tk()
-            root.configure(bg='#1a1a2e')
-            root.attributes('-fullscreen', True)
-            
-            error_msg = tk.Label(root,
-                               text="🚨 Emergency Mode 🚨\n\nCrumb encountered an error\nbut is still running\n\nTriple-tap corners to exit",
-                               font=('Arial', 20),
-                               fg='#f3a712',
-                               bg='#1a1a2e')
-            error_msg.pack(expand=True)
-            
-            def emergency_exit(event):
-                if event.x < 100 or event.x > 924:
-                    if event.y < 100 or event.y > 500:
-                        root.quit()
-            
-            root.bind('<Button-1>', emergency_exit)
-            root.mainloop()
-            
-        except:
-            print("✧ Emergency recovery failed - system exit ✧")
+        print("✧ Application terminated ✧")
 
 
 if __name__ == "__main__":
